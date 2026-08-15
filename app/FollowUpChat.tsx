@@ -65,8 +65,8 @@ export function FollowUpChat({ stopBang, fitness, decision }: FollowUpChatProps)
   }
 
   return (
-    <div className="space-y-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-      <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">Ask AeroCoach a follow-up</p>
+    <div className="space-y-3 rounded-xl border border-hairline bg-paper p-4">
+      <p className="text-xs font-semibold text-ink-soft">Ask AeroCoach a follow-up</p>
 
       {messages.length > 0 && (
         <div className="space-y-2">
@@ -74,16 +74,14 @@ export function FollowUpChat({ stopBang, fitness, decision }: FollowUpChatProps)
             <div
               key={i}
               className={`max-w-[85%] rounded-lg px-3 py-2 text-xs ${
-                m.role === "user"
-                  ? "ml-auto bg-zinc-900 text-zinc-50 dark:bg-zinc-50 dark:text-zinc-900"
-                  : "bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+                m.role === "user" ? "ml-auto bg-ink text-paper" : "bg-paper-alt text-ink"
               }`}
             >
               {m.text}
             </div>
           ))}
           {status === "loading" && (
-            <div className="max-w-[85%] rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-500 dark:bg-zinc-900 dark:text-zinc-500">
+            <div className="max-w-[85%] rounded-lg bg-paper-alt px-3 py-2 text-xs text-ink-faint">
               Thinking…
             </div>
           )}
@@ -96,7 +94,7 @@ export function FollowUpChat({ stopBang, fitness, decision }: FollowUpChatProps)
             <button
               key={q}
               onClick={() => ask(q)}
-              className="rounded-full border border-zinc-300 px-2.5 py-1 text-[11px] text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-900"
+              className="rounded-full border border-hairline px-2.5 py-1 text-[11px] text-ink-soft transition-colors hover:border-accent hover:text-accent-ink disabled:opacity-50"
             >
               {q}
             </button>
@@ -105,9 +103,7 @@ export function FollowUpChat({ stopBang, fitness, decision }: FollowUpChatProps)
       )}
 
       {errorMessage && (
-        <p className="rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-          {errorMessage}
-        </p>
+        <p className="rounded-lg bg-paper-alt px-3 py-2 text-xs text-ink-soft">{errorMessage}</p>
       )}
 
       <form
@@ -124,18 +120,18 @@ export function FollowUpChat({ stopBang, fitness, decision }: FollowUpChatProps)
           maxLength={MAX_QUESTION_LENGTH}
           placeholder="Ask a question about your result…"
           disabled={status === "loading"}
-          className="flex-1 rounded-full border border-zinc-300 px-3 py-1.5 text-xs text-zinc-900 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className="flex-1 rounded-full border border-hairline bg-paper px-3 py-1.5 text-xs text-ink disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={status === "loading" || !input.trim()}
-          className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+          className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-paper transition-colors hover:bg-accent disabled:opacity-50"
         >
           Send
         </button>
       </form>
 
-      <p className="text-[10px] text-zinc-500 dark:text-zinc-500">
+      <p className="text-[10px] text-ink-faint">
         AeroCoach can explain your result, not diagnose you — for anything beyond this screening, talk to a
         healthcare provider.
       </p>

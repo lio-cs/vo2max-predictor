@@ -10,6 +10,18 @@ const ERROR_MESSAGES: Record<string, string> = {
   token_exchange_failed: "Couldn't reach Fitbit just now. This is on us, not your data — please try again.",
 };
 
+function BrandRow() {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="relative flex h-2 w-2">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+      </span>
+      <span className="font-display text-lg font-semibold tracking-tight text-ink">AeroCoach</span>
+    </div>
+  );
+}
+
 export default async function Home({
   searchParams,
 }: {
@@ -19,41 +31,49 @@ export default async function Home({
   const session = await getSession();
 
   return (
-    <div className="flex min-h-dvh flex-col bg-zinc-50 dark:bg-black">
+    <div className="flex min-h-dvh flex-col bg-paper">
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-16 sm:px-10">
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
-          AeroCoach
-        </h1>
-        <p className="mt-3 max-w-prose text-base leading-relaxed text-zinc-600 sm:text-lg dark:text-zinc-400">
-          Your Fitbit already knows more than you think. AeroCoach translates VO2max — the
-          fitness number you already track — into a plain-English read on your sleep-apnea risk.
-          No lab visit, no new device.
-        </p>
-
-        {error && (
-          <p className="mt-4 rounded-lg bg-zinc-100 px-4 py-3 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-            {ERROR_MESSAGES[error] ?? "Something went wrong. Please try again."}
-          </p>
-        )}
+        <BrandRow />
 
         {!session ? (
-          <>
+          <div className="relative mt-10">
+            <div
+              aria-hidden
+              className="animate-breathe absolute -top-16 -left-10 h-56 w-56 rounded-full bg-accent/25 blur-3xl"
+            />
+            <h1 className="relative font-display text-4xl font-medium leading-[1.1] tracking-tight text-ink sm:text-5xl">
+              Your Fitbit already knows{" "}
+              <span className="text-gradient-accent">more than you think</span>.
+            </h1>
+            <p className="relative mt-4 max-w-prose text-base leading-relaxed text-ink-soft sm:text-lg">
+              AeroCoach translates VO2max — the fitness number you already track — into a
+              plain-English read on your sleep-apnea risk. No lab visit, no new device.
+            </p>
+
+            {error && (
+              <p className="relative mt-4 rounded-lg bg-paper-alt px-4 py-3 text-sm text-ink-soft">
+                {ERROR_MESSAGES[error] ?? "Something went wrong. Please try again."}
+              </p>
+            )}
+
             <a
               href="/api/auth/login"
-              className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700 sm:w-auto sm:px-8 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="relative mt-8 inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-medium text-paper transition-all hover:-translate-y-0.5 hover:bg-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper sm:w-auto sm:px-8"
             >
               Connect Fitbit
             </a>
-            <p className="mt-3 max-w-prose text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="relative mt-3 max-w-prose text-xs text-ink-faint">
               Takes under a minute. AeroCoach is a wellness and educational tool, not a
               diagnostic medical device. It doesn&apos;t replace a physician or a clinical sleep
               study — it helps you know when it&apos;s time to ask for one.
             </p>
-          </>
+          </div>
         ) : (
-          <Suspense fallback={<ConnectingState />}>
-            <Result />
-          </Suspense>
+          <div className="mt-10">
+            <Suspense fallback={<ConnectingState />}>
+              <Result />
+            </Suspense>
+          </div>
         )}
       </div>
     </div>
@@ -68,7 +88,7 @@ async function Result() {
       return (
         <a
           href="/api/auth/login"
-          className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700 sm:w-auto sm:px-8 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-medium text-paper transition-all hover:-translate-y-0.5 hover:bg-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper sm:w-auto sm:px-8"
         >
           Connect Fitbit
         </a>
@@ -79,19 +99,19 @@ async function Result() {
     // same neutral treatment as the connect card, not a warning color.
     if (result.error === "no_age" || result.error === "no_resting_heart_rate") {
       return (
-        <div className="mt-6 space-y-4">
-          <div className="rounded-xl bg-zinc-100 p-4 dark:bg-zinc-900">
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Almost there.</p>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{result.message}</p>
+        <div className="space-y-4">
+          <div className="rounded-xl bg-paper-alt p-4">
+            <p className="text-sm font-semibold text-ink">Almost there.</p>
+            <p className="mt-1 text-sm text-ink-soft">{result.message}</p>
           </div>
           <div className="flex items-center gap-4">
             <a
               href="/"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+              className="inline-flex items-center justify-center rounded-full border border-hairline px-4 py-2 text-xs font-medium text-ink-soft transition-colors hover:bg-paper-alt"
             >
               Check again
             </a>
-            <a href="/api/auth/logout" className="text-xs text-zinc-500 underline dark:text-zinc-400">
+            <a href="/api/auth/logout" className="text-xs text-ink-faint underline">
               Disconnect
             </a>
           </div>
@@ -102,23 +122,21 @@ async function Result() {
     // State 6 (error): reassuring, not alarming — a scary-looking error on a health-adjacent
     // product can itself cause worry, so this stays visually calm too.
     return (
-      <div className="mt-6 space-y-4">
-        <div className="rounded-xl bg-zinc-100 p-4 dark:bg-zinc-900">
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-            Something didn&apos;t load right.
-          </p>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="space-y-4">
+        <div className="rounded-xl bg-paper-alt p-4">
+          <p className="text-sm font-semibold text-ink">Something didn&apos;t load right.</p>
+          <p className="mt-1 text-sm text-ink-soft">
             {result.message} This is on us, not your data.
           </p>
         </div>
         <div className="flex items-center gap-4">
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-full border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="inline-flex items-center justify-center rounded-full border border-hairline px-4 py-2 text-xs font-medium text-ink-soft transition-colors hover:bg-paper-alt"
           >
             Try again
           </a>
-          <a href="/api/auth/logout" className="text-xs text-zinc-500 underline dark:text-zinc-400">
+          <a href="/api/auth/logout" className="text-xs text-ink-faint underline">
             Disconnect
           </a>
         </div>
@@ -127,27 +145,36 @@ async function Result() {
   }
 
   return (
-    <div className="mt-6 space-y-4">
-      <div className="rounded-xl bg-zinc-100 p-6 text-center dark:bg-zinc-900">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Estimated VO2 max</p>
-        <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-50">{result.vo2max}</p>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">mL/kg/min</p>
+    <div className="space-y-4">
+      <div className="rounded-xl bg-paper-alt p-6 text-center">
+        <p className="text-sm text-ink-faint">Estimated VO2 max</p>
+        <div className="mt-1 flex items-center justify-center gap-3">
+          <p className="text-4xl font-bold text-ink">{result.vo2max}</p>
+          <span aria-hidden className="flex h-8 items-end gap-0.5">
+            {[12, 20, 10, 26, 16].map((barHeight, i) => (
+              <span
+                key={i}
+                className="animate-eq w-1 rounded-full bg-accent"
+                style={{ height: barHeight, animationDelay: `${i * 0.15}s` }}
+              />
+            ))}
+          </span>
+        </div>
+        <p className="text-xs text-ink-faint">mL/kg/min</p>
       </div>
 
       <dl className="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <dt className="text-zinc-500 dark:text-zinc-400">Resting heart rate</dt>
-          <dd className="font-medium text-zinc-900 dark:text-zinc-50">
-            {result.restingHeartRate} bpm
-          </dd>
+          <dt className="text-ink-faint">Resting heart rate</dt>
+          <dd className="font-medium text-ink">{result.restingHeartRate} bpm</dd>
         </div>
         <div>
-          <dt className="text-zinc-500 dark:text-zinc-400">Age</dt>
-          <dd className="font-medium text-zinc-900 dark:text-zinc-50">{result.age}</dd>
+          <dt className="text-ink-faint">Age</dt>
+          <dd className="font-medium text-ink">{result.age}</dd>
         </div>
       </dl>
 
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+      <p className="text-xs text-ink-faint">
         Estimate only, based on the Uth–Sørensen–Overgaard–Pedersen formula (HRmax/HRrest). Most
         accurate for moderately fit adults — not a substitute for a lab-measured VO2max test.
       </p>
@@ -155,13 +182,13 @@ async function Result() {
       {process.env.GEMINI_API_KEY ? (
         <StopBangForm />
       ) : (
-        <div className="rounded-xl border border-dashed border-zinc-300 p-4 text-xs text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+        <div className="rounded-xl border border-dashed border-hairline p-4 text-xs text-ink-faint">
           AeroCoach is disabled — set <code>GEMINI_API_KEY</code> in <code>.env.local</code> to
           enable daily AI coaching.
         </div>
       )}
 
-      <a href="/api/auth/logout" className="text-xs text-zinc-500 underline dark:text-zinc-400">
+      <a href="/api/auth/logout" className="text-xs text-ink-faint underline">
         Disconnect
       </a>
     </div>

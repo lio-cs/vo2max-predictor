@@ -49,11 +49,6 @@ interface CoachResponse {
   decision: CoachDecision;
 }
 
-// Deliberately one neutral style for every tier, not a red/amber/green traffic light —
-// the calmest visual treatment should be the one delivering the most sensitive information.
-const RISK_BADGE_STYLE =
-  "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200";
-
 const WHY_THIS_MATTERS =
   "Sleep apnea affects an estimated 1 in 3 US adults, and about 80% don't know they have it. " +
   "It's not something your fitness tracker can diagnose — but the patterns it's picking up are " +
@@ -90,10 +85,10 @@ export function StopBangForm() {
 
   if (!result) {
     return (
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-zinc-200 p-5 dark:border-zinc-800">
+      <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-hairline p-5">
         <div>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">AeroCoach — OSA screening (STOP-BANG)</p>
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="font-display text-base font-medium text-ink">AeroCoach — OSA screening (STOP-BANG)</p>
+          <p className="mt-1 text-xs text-ink-faint">
             8 quick yes/no questions. STOP-BANG is a validated screening questionnaire, not a
             diagnostic test — AeroCoach does not diagnose OSA or any other condition, only a
             clinician-ordered sleep study can. The information shown, including any
@@ -104,7 +99,7 @@ export function StopBangForm() {
         {status === "loading" ? (
           // Keeps the same card shell (title + border) in place while swapping the
           // questions out for rotating status copy — no layout jump between states.
-          <div className="rounded-lg bg-zinc-100 p-4 dark:bg-zinc-900">
+          <div className="rounded-lg bg-paper-alt p-4">
             <LoadingLines
               lines={[
                 "Scoring your STOP-BANG answers…",
@@ -117,12 +112,12 @@ export function StopBangForm() {
         ) : (
           <div className="space-y-2">
             {QUESTIONS.map((q) => (
-              <label key={q.key} className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+              <label key={q.key} className="flex items-start gap-2 text-sm text-ink-soft">
                 <input
                   type="checkbox"
                   checked={answers[q.key]}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, [q.key]: e.target.checked }))}
-                  className="mt-0.5"
+                  className="mt-0.5 accent-accent"
                 />
                 {q.label}
               </label>
@@ -131,15 +126,13 @@ export function StopBangForm() {
         )}
 
         {errorMessage && (
-          <p className="rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-            {errorMessage}
-          </p>
+          <p className="rounded-lg bg-paper-alt px-3 py-2 text-xs text-ink-soft">{errorMessage}</p>
         )}
 
         <button
           type="submit"
           disabled={status === "loading"}
-          className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-all hover:-translate-y-0.5 hover:bg-accent disabled:pointer-events-none disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
         >
           {status === "loading" ? "Checking…" : "Get my coaching"}
         </button>
@@ -150,53 +143,44 @@ export function StopBangForm() {
   const { fitness, stopBang, decision } = result;
 
   return (
-    <div className="space-y-4 rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="space-y-4 rounded-xl border border-hairline bg-paper-alt p-5">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">AeroCoach</p>
-        <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${RISK_BADGE_STYLE}`}>
+        <p className="font-display text-base font-medium text-ink">AeroCoach</p>
+        <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-medium text-accent-ink capitalize">
           {stopBang.riskLevel} risk
         </span>
       </div>
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">
           What your data&apos;s been saying
         </p>
-        <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{decision.riskExplanation}</p>
+        <p className="mt-1 text-sm text-ink">{decision.riskExplanation}</p>
       </div>
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Why this matters
-        </p>
-        <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{WHY_THIS_MATTERS}</p>
+        <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">Why this matters</p>
+        <p className="mt-1 text-sm text-ink">{WHY_THIS_MATTERS}</p>
       </div>
 
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          What to do next
-        </p>
-        <div className="mt-1 rounded-lg bg-white/60 p-3 text-sm dark:bg-black/20">
-          <p className="font-medium text-zinc-900 dark:text-zinc-50">
-            {decision.recommendedAction.type.replace(/_/g, " ")}
-          </p>
-          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{decision.recommendedAction.rationale}</p>
+        <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">What to do next</p>
+        <div className="mt-1 rounded-lg bg-paper p-3 text-sm">
+          <p className="font-medium text-ink capitalize">{decision.recommendedAction.type.replace(/_/g, " ")}</p>
+          <p className="mt-1 text-xs text-ink-soft">{decision.recommendedAction.rationale}</p>
         </div>
       </div>
 
-      <p className="text-xs italic text-zinc-600 dark:text-zinc-400">{decision.motivationalNudge}</p>
+      <p className="text-xs text-ink-soft italic">{decision.motivationalNudge}</p>
 
-      <p className="text-[10px] text-zinc-500 dark:text-zinc-500">
+      <p className="text-[10px] text-ink-faint">
         VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")}) — general fitness
         context, separate from your OSA risk tier above, not evidence of OSA risk itself. AeroCoach is a
         wellness and educational tool, not a diagnostic medical device. It doesn&apos;t replace a physician
         or a clinical sleep study — it helps you know when it&apos;s time to ask for one.
       </p>
 
-      <button
-        onClick={() => setResult(null)}
-        className="text-xs text-zinc-500 underline dark:text-zinc-400"
-      >
+      <button onClick={() => setResult(null)} className="text-xs text-ink-faint underline">
         Redo screening
       </button>
 

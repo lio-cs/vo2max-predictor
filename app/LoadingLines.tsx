@@ -35,10 +35,10 @@ export function LoadingLines({
   return (
     <div className="flex items-center gap-3">
       <span className="relative flex h-2.5 w-2.5 shrink-0">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-zinc-400 opacity-75 dark:bg-zinc-600" />
-        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-zinc-500 dark:bg-zinc-400" />
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent" />
       </span>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400" aria-live="polite">
+      <p className="text-sm text-ink-soft" aria-live="polite">
         {stalled ? stallMessage : lines[index]}
       </p>
     </div>

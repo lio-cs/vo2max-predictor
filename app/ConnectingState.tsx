@@ -4,7 +4,7 @@ import { LoadingLines } from "./LoadingLines";
 // found" and "Google Health responded," so a slow API call doesn't leave a blank content area.
 export function ConnectingState() {
   return (
-    <div className="mt-6 rounded-xl bg-zinc-100 p-6 dark:bg-zinc-900">
+    <div className="rounded-xl bg-paper-alt p-6">
       <LoadingLines
         lines={[
           "Connecting to Fitbit…",
