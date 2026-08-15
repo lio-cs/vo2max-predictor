@@ -7,7 +7,7 @@
   /* Formal navy / off-white / teal palette. "ink" and "paper" swap roles between
      light and dark so bg-ink/text-paper buttons invert correctly in both themes. */
   --paper: #f5f2ea;
-  --paper-alt: #ece5d3;
+  --paper-alt: #e5f2ef;
   --ink: #101f2e;
   --ink-soft: #46566b;
   --ink-faint: #7c8798;
@@ -41,7 +41,7 @@
     --foreground: #f3efe4;
 
     --paper: #0a1420;
-    --paper-alt: #12233a;
+    --paper-alt: #0f2a2b;
     --ink: #f3efe4;
     --ink-soft: #b9c2cf;
     --ink-faint: #7f8fa3;
@@ -87,9 +87,21 @@ body {
   transform-origin: bottom;
 }
 
+/* Flowing line for the pulse/waveform icon on the connecting state. */
+@keyframes draw-line {
+  0% { stroke-dashoffset: 64; }
+  50% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -64; }
+}
+.animate-draw-line {
+  stroke-dasharray: 64;
+  animation: draw-line 2.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-breathe,
   .animate-eq,
+  .animate-draw-line,
   .animate-ping {
     animation: none !important;
   }

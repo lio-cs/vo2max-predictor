@@ -101,6 +101,19 @@ async function Result() {
       return (
         <div className="space-y-4">
           <div className="rounded-xl bg-paper-alt p-4">
+            <svg aria-hidden viewBox="0 0 76 12" className="mb-3 h-3 w-20">
+              {[0, 16, 32, 48, 64].map((cx, i) => (
+                <circle
+                  key={cx}
+                  cx={cx + 6}
+                  cy="6"
+                  r="5"
+                  fill={i < 3 ? "var(--accent)" : "none"}
+                  stroke={i < 3 ? "none" : "var(--hairline)"}
+                  strokeWidth="1.5"
+                />
+              ))}
+            </svg>
             <p className="text-sm font-semibold text-ink">Almost there.</p>
             <p className="mt-1 text-sm text-ink-soft">{result.message}</p>
           </div>
@@ -124,6 +137,16 @@ async function Result() {
     return (
       <div className="space-y-4">
         <div className="rounded-xl bg-paper-alt p-4">
+          <svg aria-hidden viewBox="0 0 24 24" className="mb-3 h-6 w-6 text-ink-faint">
+            <path
+              d="M21 12a9 9 0 1 1-3.5-7.14M21 4v5h-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
           <p className="text-sm font-semibold text-ink">Something didn&apos;t load right.</p>
           <p className="mt-1 text-sm text-ink-soft">
             {result.message} This is on us, not your data.
