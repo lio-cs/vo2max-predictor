@@ -48,11 +48,15 @@ interface CoachResponse {
   decision: CoachDecision;
 }
 
-const RISK_STYLES: Record<string, string> = {
-  low: "bg-emerald-200 text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100",
-  intermediate: "bg-amber-200 text-amber-900 dark:bg-amber-800 dark:text-amber-100",
-  high: "bg-red-200 text-red-900 dark:bg-red-800 dark:text-red-100",
-};
+// Deliberately one neutral style for every tier, not a red/amber/green traffic light —
+// the calmest visual treatment should be the one delivering the most sensitive information.
+const RISK_BADGE_STYLE =
+  "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200";
+
+const WHY_THIS_MATTERS =
+  "Sleep apnea affects an estimated 1 in 3 US adults, and about 80% don't know they have it. " +
+  "It's not something your fitness tracker can diagnose — but the patterns it's picking up are " +
+  "worth a closer look.";
 
 export function StopBangForm() {
   const [answers, setAnswers] = useState<StopBangAnswers>(DEFAULT_ANSWERS);
@@ -111,7 +115,7 @@ export function StopBangForm() {
         </div>
 
         {errorMessage && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-950 dark:text-red-300">
+          <p className="rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
             {errorMessage}
           </p>
         )}
@@ -130,29 +134,47 @@ export function StopBangForm() {
   const { fitness, stopBang, decision } = result;
 
   return (
-    <div className="space-y-3 rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="space-y-4 rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">AeroCoach</p>
-        <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${RISK_STYLES[stopBang.riskLevel]}`}>
-          STOP-BANG {stopBang.score}/8 · {stopBang.riskLevel} risk
+        <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${RISK_BADGE_STYLE}`}>
+          {stopBang.riskLevel} risk
         </span>
       </div>
 
-      <p className="text-sm text-zinc-800 dark:text-zinc-200">{decision.riskExplanation}</p>
-
-      <div className="rounded-lg bg-white/60 p-3 text-sm dark:bg-black/20">
-        <p className="font-medium text-zinc-900 dark:text-zinc-50">
-          Recommended: {decision.recommendedAction.type.replace(/_/g, " ")}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          What your data&apos;s been saying
         </p>
-        <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{decision.recommendedAction.rationale}</p>
+        <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{decision.riskExplanation}</p>
+      </div>
+
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          Why this matters
+        </p>
+        <p className="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{WHY_THIS_MATTERS}</p>
+      </div>
+
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          What to do next
+        </p>
+        <div className="mt-1 rounded-lg bg-white/60 p-3 text-sm dark:bg-black/20">
+          <p className="font-medium text-zinc-900 dark:text-zinc-50">
+            {decision.recommendedAction.type.replace(/_/g, " ")}
+          </p>
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{decision.recommendedAction.rationale}</p>
+        </div>
       </div>
 
       <p className="text-xs italic text-zinc-600 dark:text-zinc-400">{decision.motivationalNudge}</p>
 
       <p className="text-[10px] text-zinc-500 dark:text-zinc-500">
-        VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")}) — general fitness context,
-        separate from your OSA risk tier above, not evidence of OSA risk itself. This is a screening result,
-        not a diagnosis — talk to a healthcare provider if you&apos;re concerned about your symptoms.
+        VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")}) — general fitness
+        context, separate from your OSA risk tier above, not evidence of OSA risk itself. AeroCoach is a
+        wellness and educational tool, not a diagnostic medical device. It doesn&apos;t replace a physician
+        or a clinical sleep study — it helps you know when it&apos;s time to ask for one.
       </p>
 
       <button
