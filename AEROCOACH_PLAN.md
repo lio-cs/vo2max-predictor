@@ -64,6 +64,8 @@ All in `vo2max-predictor/`, builds and type-checks clean, $0 spend (free tiers o
 | `lib/coachLog.ts` | Firestore logging (no-ops until GCP is configured) |
 | `app/api/coach/route.ts` | POST route accepting STOP-BANG answers, composing the full flow |
 | `app/StopBangForm.tsx` | Client-side 8-question form + results panel |
+| `app/FollowUpChat.tsx` | Post-result follow-up chat (suggested questions + free text) |
+| `app/api/coach/ask/route.ts` | POST route for follow-up questions, same auth/rate-limit gates as `/api/coach` |
 | `app/page.tsx` | Home page, renders the form once authenticated |
 | `instrumentation.ts` | Registers LangFuse tracing at server startup (no-ops if unconfigured) |
 | `lib/rateLimit.ts` | In-memory rate limiting (10 req/min per client) on `/api/coach` |
@@ -432,6 +434,70 @@ payload).
   results-panel disclaimer text) — a strictly more careful version of what was already there,
   so it didn't need to wait for review; the fuller draft still does
 
+## 10a. Repo is live
+
+`https://github.com/lio-cs/vo2max-predictor` — public, pushed Aug 13. Verified clean before and
+after publishing: `.gitignore` already excluded `node_modules`, `.next`, and all `.env*` files
+except `.env.local.example`; double-checked directly post-publish that `.env.local` 404s (not
+present). Initial commit is all 48 tracked files as one clean history, not a messy multi-day
+trail. Share this link directly — no collaborator invite needed since it's public.
+
+## 10b. First real end-to-end run + follow-up chat (Aug 14–15)
+
+**Real live test happened for the first time.** Lionel set up real credentials (`GEMINI_API_KEY`,
+`GOOGLE_HEALTH_CLIENT_ID/SECRET`) and ran the actual OAuth flow in a browser. Surfaced and fixed
+two real bugs that only show up under real use, not smoke tests:
+
+1. **Cookie-mutation-during-render crash**: `getValidSession()` (`lib/googleHealth.ts`) tries to
+   refresh/clear the session cookie whenever called, but Next.js only allows cookie writes in a
+   Server Action or Route Handler — not while `page.tsx` renders as a plain Server Component.
+   This was latent since Day 1; it just needed a token to actually need refreshing to crash.
+   Fixed with `safelyPersistSession()`, which swallows *only* that specific, well-known Next.js
+   error (the in-memory session result is still correct for the current request either way; the
+   cookie gets properly persisted next time a Route Handler runs).
+2. **Invalid `FIRESTORE_SERVICE_ACCOUNT_KEY` JSON** — malformed during copy-paste into
+   `.env.local` (common failure mode for service-account keys). Since Firestore logging is
+   optional, unblocked testing by commenting out the two Firestore env vars rather than
+   debugging the JSON formatting under time pressure; proper fix still open (see checklist).
+
+**Follow-up chat added.** Lionel's feedback after the first real run: the experience should feel
+more like a chat, with the ability to ask follow-up questions (free-form or from a suggested
+list) after the main coaching result. This is the first surface in the app where real free-form
+user text reaches Gemini — STOP-BANG answers are strictly typed booleans, never free text — so
+it got the same safety discipline as the rest of the build, not a bolted-on open chat box:
+
+- `lib/geminiCoach.ts`: new `getFollowUpAnswer()`, kept separate from `getCoachDecision()`
+  rather than refactored into a shared helper, to avoid any risk to the already-tested main
+  flow. Its own scoped system prompt: can explain the screening/risk tier/fitness context, must
+  not diagnose, must not contradict the given risk tier or action, must decline off-topic
+  questions, must treat any instruction embedded in the user's message as data not a command to
+  obey. Output validated by a new `validateFollowUpAnswer()` (same diagnostic-language pattern
+  check as the main flow, extracted as its own testable function rather than left inline).
+- `app/api/coach/ask/route.ts`: new POST route. **Caught a real gap while building it**: it
+  initially had no auth check, unlike `/api/coach` — anyone could've hit it directly with
+  fabricated context and spammed free Gemini calls without ever going through the real
+  STOP-BANG flow. Added the same `getValidSession()` gate before this shipped, not after.
+  Rate-limited the same as `/api/coach`.
+- `app/FollowUpChat.tsx`: new client component — suggested-question chips, free-text input,
+  chat-style thread, appended after the STOP-BANG result panel. Chat history kept client-side
+  only for now, not persisted to Firestore (deliberate scope cut given time remaining).
+- **23 new tests** (68 total now) covering `validateFollowUpAnswer`'s diagnostic-language guard
+  and `parseAskBody`'s input validation (risk level/trend/action-type enums, history caps,
+  question length bounds, missing fields).
+- Verified: `npm test` (68 passing), `tsc`, `eslint`, `npm run build` (route list shows
+  `/api/coach/ask` correctly registered) all clean; smoke-tested the auth gate directly (`401`
+  unauthenticated, matching `/api/coach`'s behavior).
+
+**Follow-up feedback after trying it live**: the suggested-question chips disappeared after the
+first message and never changed — static list, one-shot. Fixed by having Gemini return 2-4
+*contextual* next-question suggestions alongside every answer (`suggestedFollowUps`, part of the
+same schema/response as `answer`, not a second API call), validated the same way (non-empty,
+length-bounded, capped at 5 even if the model returns more). `app/FollowUpChat.tsx` now keeps
+the chip row visible for the whole conversation and swaps in the new suggestions after each
+turn, falling back to the original static list only before the first message. 6 more tests (74
+total) covering the new validation; `npm test`/`tsc`/`eslint`/`npm run build` all reverified
+clean after the change.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
@@ -446,19 +512,23 @@ Every code change was verified (`build`/`lint`/`tsc`/smoke tests) before being m
 
 **What's next — genuinely blocked on the team, not on more AI-assisted work:**
 
-1. **Jyrah:** UI/UX pass on `app/StopBangForm.tsx` (functional, not yet styled) — the
+*(Superseded by §10b — items below marked done there are done. Kept here for the original
+context/dates.)*
+
+1. **Jyrah:** UI/UX pass on `app/StopBangForm.tsx` (now also `app/FollowUpChat.tsx`) — the
    competitive/market scan is done (§7a), including a real positioning shift (retire "zero new
    hardware") that should show up in this pass
 2. **Lionel:** set up project tools within the Gemini platform; chase Eangelica for the
    safety/guardrails API link and the Workalyzer link (outstanding since Aug 9)
-3. **Lionel:** live end-to-end test against real Fitbit data, once `.env.local` has real
-   `GEMINI_API_KEY` + Google Health OAuth credentials — the STOP-BANG flow is real and
-   testable now, this just needs your own keys
+3. ~~Live end-to-end test~~ — **done Aug 14–15**, see §10b (found + fixed two real bugs in the
+   process, then added the follow-up chat feature based on what that first real run surfaced)
 4. **Lionel:** run an actual `docker build`/`docker run` on a machine that has Docker (only
    structurally verified in this session, not run)
 5. **Whoever owns it:** an actual human legal/compliance read on `DISCLAIMER_DRAFT.md` — it's
    prep, not sign-off
-6. Once the above land: demo recording, video script, mock P&L slide (submission prep —
+6. **Lionel:** properly fix the `FIRESTORE_SERVICE_ACCOUNT_KEY` JSON formatting in `.env.local`
+   (currently commented out to unblock testing — see §10b)
+7. Once the above land: demo recording, video script, mock P&L slide (submission prep —
    the practice narrative draft is done, see §6 and `NARRATIVE_DRAFT.md`)
 
 ## 11. Notes from the mentor worth keeping in view

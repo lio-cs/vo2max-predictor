@@ -88,6 +88,27 @@ async function refreshTokens(refreshToken: string): Promise<GoogleHealthSession>
  * applies while the OAuth consent screen is in Testing mode), so the UI
  * falls back to prompting reconnection instead of showing a raw error.
  */
+/**
+ * setSession/clearSession write cookies, which Next.js only allows inside a Server Action or
+ * Route Handler — not while a Server Component is rendering (e.g. page.tsx loading `/`
+ * directly). getValidSession() is called from both contexts, so a refresh/clear triggered
+ * during a plain page render would otherwise crash the render entirely. Swallow *only* that
+ * specific, well-known Next.js error: the in-memory session result below is still correct for
+ * the current request either way, and the cookie gets properly persisted the next time a
+ * Route Handler runs (e.g. /api/coach, /api/vo2max).
+ */
+async function safelyPersistSession(mutate: () => Promise<void>): Promise<void> {
+  try {
+    await mutate();
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    if (message.startsWith("Cookies can only be modified")) {
+      return;
+    }
+    throw e;
+  }
+}
+
 export async function getValidSession(): Promise<GoogleHealthSession | null> {
   const session = await getSession();
   if (!session) return null;
@@ -99,10 +120,10 @@ export async function getValidSession(): Promise<GoogleHealthSession | null> {
 
   try {
     const refreshed = await refreshTokens(session.refreshToken);
-    await setSession(refreshed);
+    await safelyPersistSession(() => setSession(refreshed));
     return refreshed;
   } catch {
-    await clearSession();
+    await safelyPersistSession(() => clearSession());
     return null;
   }
 }

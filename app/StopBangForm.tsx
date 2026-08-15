@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FollowUpChat } from "./FollowUpChat";
 
 interface StopBangAnswers {
   snoring: boolean;
@@ -160,6 +161,8 @@ export function StopBangForm() {
       >
         Redo screening
       </button>
+
+      <FollowUpChat stopBang={stopBang} fitness={fitness} decision={decision} />
     </div>
   );
 }
