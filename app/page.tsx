@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import { getSession } from "@/lib/session";
 import { computeVo2Max } from "@/lib/vo2max-service";
 import { StopBangForm } from "./StopBangForm";
+import { ConnectingState } from "./ConnectingState";
 
 const ERROR_MESSAGES: Record<string, string> = {
   access_denied: "You declined the Fitbit authorization request.",
@@ -17,10 +19,12 @@ export default async function Home({
   const session = await getSession();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-zinc-50 px-6 py-16 dark:bg-black">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">AeroCoach</h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+    <div className="flex min-h-dvh flex-col bg-zinc-50 dark:bg-black">
+      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-16 sm:px-10">
+        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
+          AeroCoach
+        </h1>
+        <p className="mt-3 max-w-prose text-base leading-relaxed text-zinc-600 sm:text-lg dark:text-zinc-400">
           Your Fitbit already knows more than you think. AeroCoach translates VO2max — the
           fitness number you already track — into a plain-English read on your sleep-apnea risk.
           No lab visit, no new device.
@@ -36,18 +40,20 @@ export default async function Home({
           <>
             <a
               href="/api/auth/login"
-              className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+              className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700 sm:w-auto sm:px-8 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
             >
               Connect Fitbit
             </a>
-            <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-3 max-w-prose text-xs text-zinc-500 dark:text-zinc-400">
               Takes under a minute. AeroCoach is a wellness and educational tool, not a
               diagnostic medical device. It doesn&apos;t replace a physician or a clinical sleep
               study — it helps you know when it&apos;s time to ask for one.
             </p>
           </>
         ) : (
-          <Result />
+          <Suspense fallback={<ConnectingState />}>
+            <Result />
+          </Suspense>
         )}
       </div>
     </div>
@@ -62,7 +68,7 @@ async function Result() {
       return (
         <a
           href="/api/auth/login"
-          className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700 sm:w-auto sm:px-8 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           Connect Fitbit
         </a>

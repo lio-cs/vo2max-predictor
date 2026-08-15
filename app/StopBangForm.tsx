@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FollowUpChat } from "./FollowUpChat";
+import { LoadingLines } from "./LoadingLines";
 
 interface StopBangAnswers {
   snoring: boolean;
@@ -100,19 +101,34 @@ export function StopBangForm() {
           </p>
         </div>
 
-        <div className="space-y-2">
-          {QUESTIONS.map((q) => (
-            <label key={q.key} className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300">
-              <input
-                type="checkbox"
-                checked={answers[q.key]}
-                onChange={(e) => setAnswers((prev) => ({ ...prev, [q.key]: e.target.checked }))}
-                className="mt-0.5"
-              />
-              {q.label}
-            </label>
-          ))}
-        </div>
+        {status === "loading" ? (
+          // Keeps the same card shell (title + border) in place while swapping the
+          // questions out for rotating status copy — no layout jump between states.
+          <div className="rounded-lg bg-zinc-100 p-4 dark:bg-zinc-900">
+            <LoadingLines
+              lines={[
+                "Scoring your STOP-BANG answers…",
+                "Checking in on your fitness trend…",
+                "Translating that into plain English…",
+              ]}
+              stallMessage="Still working — almost there…"
+            />
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {QUESTIONS.map((q) => (
+              <label key={q.key} className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={answers[q.key]}
+                  onChange={(e) => setAnswers((prev) => ({ ...prev, [q.key]: e.target.checked }))}
+                  className="mt-0.5"
+                />
+                {q.label}
+              </label>
+            ))}
+          </div>
+        )}
 
         {errorMessage && (
           <p className="rounded-lg bg-zinc-100 px-3 py-2 text-xs text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
