@@ -3,8 +3,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { exchangeCodeForTokens } from "@/lib/googleHealth";
 import { setSession } from "@/lib/session";
 
+/**
+ * Deliberately NOT `new URL(request.url).origin` — behind Cloud Run's proxy, that reflects the
+ * container's internal bind address (HOSTNAME=0.0.0.0), not the real public host, which sent
+ * users' browsers to the unroutable http://0.0.0.0:3000 after login. GOOGLE_HEALTH_REDIRECT_URI
+ * is already the real public URL (it has to be, to satisfy Google's own redirect_uri check), so
+ * derive the app's origin from that instead of trusting request.url.
+ */
+function getAppOrigin(): string {
+  const redirectUri = process.env.GOOGLE_HEALTH_REDIRECT_URI;
+  if (!redirectUri) {
+    throw new Error("Missing required env var: GOOGLE_HEALTH_REDIRECT_URI");
+  }
+  return new URL(redirectUri).origin;
+}
+
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const origin = getAppOrigin();
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const oauthError = searchParams.get("error");

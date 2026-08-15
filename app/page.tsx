@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { computeVo2Max } from "@/lib/vo2max-service";
 import { StopBangForm } from "./StopBangForm";
@@ -118,12 +119,12 @@ async function Result() {
             <p className="mt-1 text-sm text-ink-soft">{result.message}</p>
           </div>
           <div className="flex items-center gap-4">
-            <a
+            <Link
               href="/"
               className="inline-flex items-center justify-center rounded-full border border-hairline px-4 py-2 text-xs font-medium text-ink-soft transition-colors hover:bg-paper-alt"
             >
               Check again
-            </a>
+            </Link>
             <a href="/api/auth/logout" className="text-xs text-ink-faint underline">
               Disconnect
             </a>
@@ -153,12 +154,12 @@ async function Result() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <a
+          <Link
             href="/"
             className="inline-flex items-center justify-center rounded-full border border-hairline px-4 py-2 text-xs font-medium text-ink-soft transition-colors hover:bg-paper-alt"
           >
             Try again
-          </a>
+          </Link>
           <a href="/api/auth/logout" className="text-xs text-ink-faint underline">
             Disconnect
           </a>
