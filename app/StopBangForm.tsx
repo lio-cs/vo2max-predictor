@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FollowUpChat } from "./FollowUpChat";
 import { LoadingLines } from "./LoadingLines";
+import { TrendChart } from "./TrendChart";
 
 interface StopBangAnswers {
   snoring: boolean;
@@ -47,6 +48,8 @@ interface CoachResponse {
   fitness: { vo2max: number; trend: string };
   stopBang: { score: number; riskLevel: "low" | "intermediate" | "high" };
   decision: CoachDecision;
+  history: Array<{ date: string; vo2max: number }>;
+  milestone: { type: "new_high" | "improving_streak"; message: string } | null;
 }
 
 const WHY_THIS_MATTERS =
@@ -59,9 +62,13 @@ export function StopBangForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<CoachResponse | null>(null);
+  // Explicit consent gate for processing special-category health data (GDPR Art. 9) — see
+  // app/privacy/page.tsx. Required before submission, not just disclosed after the fact.
+  const [consented, setConsented] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!consented) return;
     setStatus("loading");
     setErrorMessage(null);
 
@@ -129,9 +136,25 @@ export function StopBangForm() {
           <p className="rounded-lg bg-paper-alt px-3 py-2 text-xs text-ink-soft">{errorMessage}</p>
         )}
 
+        {status !== "loading" && (
+          <label className="flex items-start gap-2 text-xs text-ink-soft">
+            <input
+              type="checkbox"
+              checked={consented}
+              onChange={(e) => setConsented(e.target.checked)}
+              className="mt-0.5 accent-accent"
+            />
+            I consent to processing my screening answers and fitness data as described in the{" "}
+            <a href="/privacy" target="_blank" rel="noreferrer" className="underline">
+              Privacy Policy
+            </a>
+            .
+          </label>
+        )}
+
         <button
           type="submit"
-          disabled={status === "loading"}
+          disabled={status === "loading" || !consented}
           className="inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-all hover:-translate-y-0.5 hover:bg-accent disabled:pointer-events-none disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
         >
           {status === "loading" ? "Checking…" : "Get my coaching"}
@@ -140,7 +163,7 @@ export function StopBangForm() {
     );
   }
 
-  const { fitness, stopBang, decision } = result;
+  const { fitness, stopBang, decision, history, milestone } = result;
 
   return (
     <div className="space-y-4 rounded-xl border border-hairline bg-paper-alt p-5">
@@ -172,6 +195,13 @@ export function StopBangForm() {
       </div>
 
       <p className="text-xs text-ink-soft italic">{decision.motivationalNudge}</p>
+
+      <div>
+        <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">Your trend</p>
+        <div className="mt-1 rounded-lg bg-paper p-3">
+          <TrendChart history={history} milestone={milestone} />
+        </div>
+      </div>
 
       <p className="text-[10px] text-ink-faint">
         VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")}) — general fitness

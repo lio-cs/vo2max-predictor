@@ -1,5 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { computeStopBangScore, peerAverageVo2max, assessFitnessContext, type StopBangAnswers } from "./riskTrajectory";
+import {
+  computeStopBangScore,
+  peerAverageVo2max,
+  assessFitnessContext,
+  classifyFitnessLevel,
+  detectMilestone,
+  type StopBangAnswers,
+  type VO2maxHistoryPoint,
+} from "./riskTrajectory";
+
+function history(...vo2maxValues: number[]): VO2maxHistoryPoint[] {
+  return vo2maxValues.map((vo2max, i) => ({ date: `2026-08-${10 + i}`, vo2max }));
+}
 
 const NO_ANSWERS: StopBangAnswers = {
   snoring: false,
@@ -134,5 +146,66 @@ describe("assessFitnessContext", () => {
     // peerAverageVo2max(30) === 41, so ratio should be exactly 1
     expect(result.peerAverageVo2max).toBe(41);
     expect(result.ratioToPeerAverage).toBe(1);
+  });
+
+  it("includes fitnessLevel derived from the ratio", () => {
+    // peerAverageVo2max(30) === 41; 30/41 ≈ 0.73, well under the 0.85 below_average threshold
+    expect(assessFitnessContext(30, 30, []).fitnessLevel).toBe("below_average");
+    // 41/41 === 1, squarely average
+    expect(assessFitnessContext(41, 30, []).fitnessLevel).toBe("average");
+    // 50/41 ≈ 1.22, over the 1.15 above_average threshold
+    expect(assessFitnessContext(50, 30, []).fitnessLevel).toBe("above_average");
+  });
+});
+
+describe("classifyFitnessLevel", () => {
+  it("classifies below-average at the boundary", () => {
+    expect(classifyFitnessLevel(0.84)).toBe("below_average");
+    expect(classifyFitnessLevel(0.85)).toBe("average");
+  });
+
+  it("classifies above-average at the boundary", () => {
+    expect(classifyFitnessLevel(1.15)).toBe("average");
+    expect(classifyFitnessLevel(1.16)).toBe("above_average");
+  });
+
+  it("classifies exactly at peer average as average", () => {
+    expect(classifyFitnessLevel(1.0)).toBe("average");
+  });
+});
+
+describe("detectMilestone", () => {
+  it("returns null with fewer than 2 readings", () => {
+    expect(detectMilestone([])).toBeNull();
+    expect(detectMilestone(history(40))).toBeNull();
+  });
+
+  it("returns null when nothing notable happened", () => {
+    expect(detectMilestone(history(40, 39, 40))).toBeNull();
+  });
+
+  it("detects a new high when the latest reading beats every prior one", () => {
+    const result = detectMilestone(history(38, 39, 41));
+    expect(result).toEqual({ type: "new_high", message: "That's your highest VO2max reading yet." });
+  });
+
+  it("does not call a tie a new high", () => {
+    expect(detectMilestone(history(40, 41, 41))).toBeNull();
+  });
+
+  it("detects a 3+ improving streak even without a new high", () => {
+    // Peaked at 50, now recovering: 3 in a row improving (44 -> 46 -> 48) but still below the
+    // earlier high of 50, so this should be a streak, not a new_high.
+    const result = detectMilestone(history(50, 44, 46, 48));
+    expect(result).toEqual({ type: "improving_streak", message: "3 readings in a row trending up." });
+  });
+
+  it("does not flag a streak shorter than the threshold", () => {
+    expect(detectMilestone(history(50, 44, 46))).toBeNull();
+  });
+
+  it("a new high takes precedence over reporting it as a streak", () => {
+    const result = detectMilestone(history(38, 39, 40, 41));
+    expect(result?.type).toBe("new_high");
   });
 });

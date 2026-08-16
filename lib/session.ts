@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { createHash } from "crypto";
 
 const SESSION_COOKIE = "google_health_session";
 
@@ -6,6 +7,16 @@ export interface GoogleHealthSession {
   accessToken: string;
   refreshToken: string;
   expiresAt: number; // epoch ms
+}
+
+/**
+ * A stable-per-user, non-identifying key for scoping storage (Firestore logs, etc.) — derived
+ * from the refresh token rather than any profile data, so it stays consistent for the same
+ * user across sessions without ever storing or deriving anything from their name/email. The
+ * refresh token itself is never stored anywhere this key touches, only its one-way hash.
+ */
+export function getUserKey(session: GoogleHealthSession): string {
+  return createHash("sha256").update(session.refreshToken).digest("hex").slice(0, 16);
 }
 
 export async function getSession(): Promise<GoogleHealthSession | null> {

@@ -9,12 +9,11 @@ export interface CoachLogEntry {
 }
 
 /**
- * This app is single-user (session is just an httpOnly cookie, no account system — see
- * lib/session.ts), so every log entry lives under one fixed document. A real multi-user
- * product would key this by an actual user ID.
+ * Logs are keyed by a stable-but-anonymous per-user key (see lib/session.ts's getUserKey) —
+ * previously this was a single fixed document, which meant every user's coaching history
+ * collided in the same place. Found and fixed once the app had more than one real test user.
  */
 const LOG_COLLECTION = "aerocoach_logs";
-const LOG_DOC_ID = "default";
 
 let firestoreLib: typeof import("firebase-admin/firestore") | null = null;
 
@@ -44,13 +43,13 @@ async function getDb() {
   return firestoreLib.getFirestore();
 }
 
-export async function getRecentLogs(limit = 7): Promise<CoachLogEntry[]> {
+export async function getRecentLogs(userKey: string, limit = 7): Promise<CoachLogEntry[]> {
   if (!isConfigured()) return [];
 
   const db = await getDb();
   const snapshot = await db
     .collection(LOG_COLLECTION)
-    .doc(LOG_DOC_ID)
+    .doc(userKey)
     .collection("entries")
     .orderBy("date", "desc")
     .limit(limit)
@@ -59,13 +58,13 @@ export async function getRecentLogs(limit = 7): Promise<CoachLogEntry[]> {
   return snapshot.docs.map((d) => d.data() as CoachLogEntry).reverse();
 }
 
-export async function appendLogEntry(entry: CoachLogEntry): Promise<void> {
+export async function appendLogEntry(userKey: string, entry: CoachLogEntry): Promise<void> {
   if (!isConfigured()) return;
 
   const db = await getDb();
   await db
     .collection(LOG_COLLECTION)
-    .doc(LOG_DOC_ID)
+    .doc(userKey)
     .collection("entries")
     .doc(entry.date)
     .set(entry, { merge: true });

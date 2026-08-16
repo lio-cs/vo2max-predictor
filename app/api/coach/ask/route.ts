@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFollowUpAnswer, type CoachDecision, type FollowUpMessage, type RecommendedActionType } from "@/lib/geminiCoach";
-import type { StopBangResult, FitnessContext, OsaRiskLevel, FitnessTrend } from "@/lib/riskTrajectory";
+import type { StopBangResult, FitnessContext, OsaRiskLevel, FitnessTrend, FitnessLevel } from "@/lib/riskTrajectory";
 import { checkRateLimit, getClientKey } from "@/lib/rateLimit";
 import { getValidSession } from "@/lib/googleHealth";
 
 const RISK_LEVELS: OsaRiskLevel[] = ["low", "intermediate", "high"];
 const ACTION_TYPES: RecommendedActionType[] = ["monitor", "mention_to_doctor", "see_doctor_soon"];
 const TRENDS: FitnessTrend[] = ["improving", "stable", "declining", "insufficient_data"];
+const FITNESS_LEVELS: FitnessLevel[] = ["below_average", "average", "above_average"];
 const MAX_QUESTION_LENGTH = 300;
 const MAX_HISTORY_MESSAGES = 20;
 
@@ -31,6 +32,7 @@ function isFitnessContext(value: unknown): value is FitnessContext {
     typeof v.vo2max === "number" &&
     typeof v.peerAverageVo2max === "number" &&
     typeof v.ratioToPeerAverage === "number" &&
+    FITNESS_LEVELS.includes(v.fitnessLevel as FitnessLevel) &&
     TRENDS.includes(v.trend as FitnessTrend)
   );
 }

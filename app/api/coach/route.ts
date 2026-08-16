@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { computeVo2Max } from "@/lib/vo2max-service";
-import { computeStopBangScore, assessFitnessContext, type StopBangAnswers } from "@/lib/riskTrajectory";
+import {
+  computeStopBangScore,
+  assessFitnessContext,
+  detectMilestone,
+  type StopBangAnswers,
+  type VO2maxHistoryPoint,
+} from "@/lib/riskTrajectory";
 import { getCoachDecision } from "@/lib/geminiCoach";
 import { appendLogEntry, getRecentLogs, isLoggingEnabled, type CoachLogEntry } from "@/lib/coachLog";
 import { checkRateLimit, getClientKey } from "@/lib/rateLimit";
+import { getValidSession } from "@/lib/googleHealth";
+import { getUserKey } from "@/lib/session";
 
 const STOP_BANG_KEYS: Array<keyof StopBangAnswers> = [
   "snoring",
@@ -62,12 +70,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(vo2Result, { status });
   }
 
+  // computeVo2Max() already confirmed a valid session exists; this re-read just gets the
+  // session object itself so logs can be scoped per-user instead of colliding in one document.
+  const session = await getValidSession();
+  if (!session) {
+    return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+  }
+  const userKey = getUserKey(session);
+
   const { age, vo2max } = vo2Result;
   const stopBang = computeStopBangScore(stopBangAnswers);
 
   let recentLogs: CoachLogEntry[] = [];
   try {
-    recentLogs = await getRecentLogs();
+    recentLogs = await getRecentLogs(userKey);
   } catch (e) {
     // Full detail server-side only — an external caller doesn't need to see internal
     // Firestore error shapes/project details.
@@ -101,12 +117,18 @@ export async function POST(request: NextRequest) {
   const entry: CoachLogEntry = { date: today, fitness, stopBang, decision };
 
   try {
-    await appendLogEntry(entry);
+    await appendLogEntry(userKey, entry);
   } catch (e) {
     // Logging failure shouldn't block today's coaching response — the decision was already
     // made, and the practice build should still be usable if Firestore is momentarily down.
     console.error("Failed to write coach log entry:", e);
   }
 
-  return NextResponse.json({ fitness, stopBang, decision, loggingEnabled: isLoggingEnabled() });
+  const history: VO2maxHistoryPoint[] = [
+    ...recentLogs.map((e) => ({ date: e.date, vo2max: e.fitness.vo2max })),
+    { date: today, vo2max },
+  ];
+  const milestone = detectMilestone(history);
+
+  return NextResponse.json({ fitness, stopBang, decision, history, milestone, loggingEnabled: isLoggingEnabled() });
 }

@@ -84,10 +84,25 @@ export function peerAverageVo2max(age: number): number {
   return points[points.length - 1].vo2max;
 }
 
+export type FitnessLevel = "below_average" | "average" | "above_average";
+
+/**
+ * Age-relative VO2max categorization — a standard, well-established exercise-physiology
+ * comparison (VO2max-for-age norms), not a disease-risk claim, so it doesn't carry the same
+ * evidence-base caution as the OSA risk tier above. Thresholds are deliberately the same
+ * ratio bands used for general fitness categorization elsewhere in sports-medicine literature.
+ */
+export function classifyFitnessLevel(ratioToPeerAverage: number): FitnessLevel {
+  if (ratioToPeerAverage < 0.85) return "below_average";
+  if (ratioToPeerAverage > 1.15) return "above_average";
+  return "average";
+}
+
 export interface FitnessContext {
   vo2max: number;
   peerAverageVo2max: number;
   ratioToPeerAverage: number;
+  fitnessLevel: FitnessLevel;
   trend: FitnessTrend;
 }
 
@@ -112,6 +127,50 @@ export function assessFitnessContext(vo2max: number, age: number, recentVo2max: 
     vo2max,
     peerAverageVo2max: Math.round(peerAverage * 10) / 10,
     ratioToPeerAverage: Math.round(ratio * 100) / 100,
+    fitnessLevel: classifyFitnessLevel(ratio),
     trend,
   };
+}
+
+export interface VO2maxHistoryPoint {
+  date: string; // YYYY-MM-DD
+  vo2max: number;
+}
+
+export type MilestoneType = "new_high" | "improving_streak";
+
+export interface Milestone {
+  type: MilestoneType;
+  message: string;
+}
+
+const IMPROVING_STREAK_THRESHOLD = 3;
+
+/**
+ * Deterministic milestone detection over a VO2max history (oldest first, most recent last) —
+ * kept as plain arithmetic, not left to the model, same reasoning as everything else in this
+ * file: Gemini explains what's already been decided, it doesn't decide it.
+ */
+export function detectMilestone(history: VO2maxHistoryPoint[]): Milestone | null {
+  if (history.length < 2) return null;
+
+  const latest = history[history.length - 1];
+  const isNewHigh = history.slice(0, -1).every((point) => point.vo2max < latest.vo2max);
+  if (isNewHigh) {
+    return { type: "new_high", message: "That's your highest VO2max reading yet." };
+  }
+
+  let streak = 1;
+  for (let i = history.length - 1; i > 0; i--) {
+    if (history[i].vo2max > history[i - 1].vo2max) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+  if (streak >= IMPROVING_STREAK_THRESHOLD) {
+    return { type: "improving_streak", message: `${streak} readings in a row trending up.` };
+  }
+
+  return null;
 }

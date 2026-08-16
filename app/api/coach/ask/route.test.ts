@@ -3,7 +3,7 @@ import { parseAskBody } from "./route";
 
 const VALID = {
   stopBang: { score: 3, riskLevel: "intermediate" },
-  fitness: { vo2max: 38, peerAverageVo2max: 37, ratioToPeerAverage: 1.03, trend: "stable" },
+  fitness: { vo2max: 38, peerAverageVo2max: 37, ratioToPeerAverage: 1.03, fitnessLevel: "average", trend: "stable" },
   decision: {
     riskExplanation: "Your score puts you in the intermediate group.",
     recommendedAction: { type: "mention_to_doctor", rationale: "Worth a mention at your next visit." },
