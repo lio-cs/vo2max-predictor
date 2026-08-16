@@ -618,6 +618,44 @@ deadline. Two things worth flagging before the list itself:
       deployment proves the Dockerfile works end-to-end, a separate local `docker run` isn't
       adding new information at this point
 
+## 10e. Implementation sprint on the Aug 16 checklist (same day)
+
+Worked through §10d's list in priority order — real bugs and clear compliance gaps first,
+then the two feature requests that were actually scoped enough to attempt with a day left:
+
+1. **Firestore multi-user collision (D)** — fixed first since it blocked #4 from being
+   meaningful. Real per-user keying via a hashed OAuth refresh token, never the token itself.
+2. **GDPR privacy policy + consent (C)** — `app/privacy/page.tsx` plus a required consent
+   checkbox before the STOP-BANG form submits. Same "real draft, not legal sign-off" status as
+   `DISCLAIMER_DRAFT.md`.
+3. **Personalized messaging (B)** — deterministic age-relative fitness classification, fed into
+   the coaching prompts so the motivational nudge reflects both fitness level and trend, not
+   trend alone.
+4. **Trend chart + milestones (B)** — deterministic new-high/streak detection, simple bar chart
+   in the UI, unblocked by #1.
+5. **SpO2 (B)** — the one item initially called out of scope until actually checking whether
+   the underlying data exists. It does (`daily-oxygen-saturation`, same OAuth scope already
+   granted), so it got built: fetched as a wearable metric, classified against standard
+   clinical thresholds, kept as supporting context only — same non-diagnostic treatment as
+   VO2max, never an input to the STOP-BANG risk tier. **One real unknown left**: the exact
+   response field name is inferred from Google's proto definition, not confirmed against a
+   live response — needs an actual test against real Fitbit data to know for sure it parses
+   correctly (same category of risk that caused the original heart-rate ordering bug).
+
+Every step verified independently (`npm test`/`tsc`/`eslint`/`npm run build`) before committing
+— 97 tests total by the end, up from 89 at the start of this sprint. All pushed to
+`github.com/lio-cs/vo2max-predictor`, Cloud Run rebuilds automatically on each push.
+
+**What's next:**
+1. **Lionel:** test the live site again, specifically to confirm SpO2 actually parses against
+   your real Fitbit data (the one unverified piece above)
+2. Everything else genuinely still open is the same as §10d's remaining items: the Workalyzer
+   link and APK-builds clarification (Eangelica), human legal review of both drafts, and
+   submission prep (demo recording, video script, business pitch/P&L — confirm with Eangelica
+   which of the last two is actually still needed)
+3. Out of scope for the remaining time, per earlier discussion: Whisper voice-to-text, Apple
+   HealthKit, Lovable/Manus
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
