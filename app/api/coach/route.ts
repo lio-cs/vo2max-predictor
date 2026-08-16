@@ -3,14 +3,16 @@ import { computeVo2Max } from "@/lib/vo2max-service";
 import {
   computeStopBangScore,
   assessFitnessContext,
+  assessOxygenContext,
   detectMilestone,
   type StopBangAnswers,
   type VO2maxHistoryPoint,
+  type OxygenContext,
 } from "@/lib/riskTrajectory";
 import { getCoachDecision } from "@/lib/geminiCoach";
 import { appendLogEntry, getRecentLogs, isLoggingEnabled, type CoachLogEntry } from "@/lib/coachLog";
 import { checkRateLimit, getClientKey } from "@/lib/rateLimit";
-import { getValidSession } from "@/lib/googleHealth";
+import { getValidSession, getLatestOxygenSaturation } from "@/lib/googleHealth";
 import { getUserKey } from "@/lib/session";
 
 const STOP_BANG_KEYS: Array<keyof StopBangAnswers> = [
@@ -100,9 +102,22 @@ export async function POST(request: NextRequest) {
     recentLogs.map((entry) => entry.fitness.vo2max)
   );
 
+  // Optional/best-effort — many devices don't support SpO2 at all, and this isn't required
+  // for the core flow the way age/resting heart rate are, so a failure here shouldn't fail
+  // the whole request.
+  let oxygen: OxygenContext | null = null;
+  try {
+    const oxygenPercentage = await getLatestOxygenSaturation(session);
+    if (oxygenPercentage != null) {
+      oxygen = assessOxygenContext(oxygenPercentage);
+    }
+  } catch (e) {
+    console.error("Failed to fetch oxygen saturation (continuing without it):", e);
+  }
+
   let decision;
   try {
-    decision = await getCoachDecision({ stopBang, fitness, recentLogs });
+    decision = await getCoachDecision({ stopBang, fitness, oxygen, recentLogs });
   } catch (e) {
     // Full detail is already captured server-side via LangFuse tracing (see geminiCoach.ts) —
     // an external caller only needs to know it failed, not the internal error shape.
@@ -130,5 +145,13 @@ export async function POST(request: NextRequest) {
   ];
   const milestone = detectMilestone(history);
 
-  return NextResponse.json({ fitness, stopBang, decision, history, milestone, loggingEnabled: isLoggingEnabled() });
+  return NextResponse.json({
+    fitness,
+    oxygen,
+    stopBang,
+    decision,
+    history,
+    milestone,
+    loggingEnabled: isLoggingEnabled(),
+  });
 }

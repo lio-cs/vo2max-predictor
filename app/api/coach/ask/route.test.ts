@@ -4,6 +4,7 @@ import { parseAskBody } from "./route";
 const VALID = {
   stopBang: { score: 3, riskLevel: "intermediate" },
   fitness: { vo2max: 38, peerAverageVo2max: 37, ratioToPeerAverage: 1.03, fitnessLevel: "average", trend: "stable" },
+  oxygen: null as { percentage: number; level: string } | null,
   decision: {
     riskExplanation: "Your score puts you in the intermediate group.",
     recommendedAction: { type: "mention_to_doctor", rationale: "Worth a mention at your next visit." },
@@ -39,6 +40,25 @@ describe("parseAskBody", () => {
     expect(
       parseAskBody({ ...VALID, fitness: { ...VALID.fitness, trend: "skyrocketing" } })
     ).toBeNull();
+  });
+
+  it("accepts null oxygen (device doesn't support it)", () => {
+    expect(parseAskBody({ ...VALID, oxygen: null })).toEqual({ ...VALID, oxygen: null });
+  });
+
+  it("accepts a valid non-null oxygen context", () => {
+    const oxygen = { percentage: 96, level: "normal" };
+    expect(parseAskBody({ ...VALID, oxygen })).toEqual({ ...VALID, oxygen });
+  });
+
+  it("rejects an oxygen object with an invalid level", () => {
+    expect(
+      parseAskBody({ ...VALID, oxygen: { percentage: 96, level: "excellent" } })
+    ).toBeNull();
+  });
+
+  it("rejects an oxygen object missing percentage", () => {
+    expect(parseAskBody({ ...VALID, oxygen: { level: "normal" } })).toBeNull();
   });
 
   it("rejects an invalid recommended action type", () => {

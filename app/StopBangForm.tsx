@@ -46,6 +46,7 @@ interface CoachDecision {
 
 interface CoachResponse {
   fitness: { vo2max: number; trend: string };
+  oxygen: { percentage: number; level: "normal" | "borderline" | "low" } | null;
   stopBang: { score: number; riskLevel: "low" | "intermediate" | "high" };
   decision: CoachDecision;
   history: Array<{ date: string; vo2max: number }>;
@@ -163,7 +164,7 @@ export function StopBangForm() {
     );
   }
 
-  const { fitness, stopBang, decision, history, milestone } = result;
+  const { fitness, oxygen, stopBang, decision, history, milestone } = result;
 
   return (
     <div className="space-y-4 rounded-xl border border-hairline bg-paper-alt p-5">
@@ -204,7 +205,8 @@ export function StopBangForm() {
       </div>
 
       <p className="text-[10px] text-ink-faint">
-        VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")}) — general fitness
+        VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")})
+        {oxygen ? ` · Blood oxygen ${oxygen.percentage}% (${oxygen.level})` : ""} — general fitness
         context, separate from your OSA risk tier above, not evidence of OSA risk itself. AeroCoach is a
         wellness and educational tool, not a diagnostic medical device. It doesn&apos;t replace a physician
         or a clinical sleep study — it helps you know when it&apos;s time to ask for one.
@@ -214,7 +216,7 @@ export function StopBangForm() {
         Redo screening
       </button>
 
-      <FollowUpChat stopBang={stopBang} fitness={fitness} decision={decision} />
+      <FollowUpChat stopBang={stopBang} fitness={fitness} oxygen={oxygen} decision={decision} />
     </div>
   );
 }

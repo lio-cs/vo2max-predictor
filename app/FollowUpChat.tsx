@@ -20,10 +20,11 @@ const MAX_QUESTION_LENGTH = 300;
 interface FollowUpChatProps {
   stopBang: unknown;
   fitness: unknown;
+  oxygen: unknown;
   decision: unknown;
 }
 
-export function FollowUpChat({ stopBang, fitness, decision }: FollowUpChatProps) {
+export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTED_QUESTIONS);
   const [input, setInput] = useState("");
@@ -44,7 +45,7 @@ export function FollowUpChat({ stopBang, fitness, decision }: FollowUpChatProps)
       const res = await fetch("/api/coach/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stopBang, fitness, decision, history: messages, question: trimmed }),
+        body: JSON.stringify({ stopBang, fitness, oxygen, decision, history: messages, question: trimmed }),
       });
       const data = await res.json();
       if (!res.ok) {

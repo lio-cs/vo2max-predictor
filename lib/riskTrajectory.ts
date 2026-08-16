@@ -174,3 +174,28 @@ export function detectMilestone(history: VO2maxHistoryPoint[]): Milestone | null
 
   return null;
 }
+
+export type OxygenLevel = "normal" | "borderline" | "low";
+
+export interface OxygenContext {
+  percentage: number;
+  level: OxygenLevel;
+}
+
+/**
+ * Standard clinical resting SpO2 interpretation (≥95% normal, 90-94% borderline, <90% low
+ * hypoxemia) — widely accepted thresholds, not specific to OSA. Unlike STOP-BANG, this is
+ * deliberately NOT an input to the OSA risk tier: unlike full overnight desaturation-event
+ * monitoring (what actually diagnoses OSA-related hypoxemia clinically), what the wearable
+ * provides is a single daily average — a much coarser signal. Same treatment as VO2max:
+ * genuine supporting context, never something that changes the STOP-BANG-derived risk tier.
+ */
+export function classifyOxygenLevel(percentage: number): OxygenLevel {
+  if (percentage < 90) return "low";
+  if (percentage < 95) return "borderline";
+  return "normal";
+}
+
+export function assessOxygenContext(percentage: number): OxygenContext {
+  return { percentage, level: classifyOxygenLevel(percentage) };
+}

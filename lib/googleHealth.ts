@@ -190,3 +190,44 @@ export async function getLatestRestingHeartRate(session: GoogleHealthSession): P
   }
   return Number(bpm);
 }
+
+interface DailyOxygenSaturationDataPoint {
+  dailyOxygenSaturation?: {
+    date?: { year: number; month: number; day: number };
+    averagePercentage?: number | string;
+  };
+}
+
+interface OxygenDataPointsResponse {
+  dataPoints?: DailyOxygenSaturationDataPoint[];
+}
+
+/**
+ * Most recent daily average blood oxygen saturation (SpO2), or null if unavailable — many
+ * Fitbit models don't support this at all. Same descending-order assumption as resting heart
+ * rate (confirmed general behavior of this API), same defensive throw-on-mismatch: the exact
+ * field name here is inferred from Google's proto definition (DailyOxygenSaturation ->
+ * average_percentage, converted to camelCase per standard proto3 JSON mapping) since the REST
+ * docs don't show a worked example — not yet confirmed against a real live response.
+ */
+export async function getLatestOxygenSaturation(session: GoogleHealthSession): Promise<number | null> {
+  const res = await healthFetch(
+    session,
+    "/users/me/dataTypes/daily-oxygen-saturation/dataPoints?pageSize=7"
+  );
+  if (!res.ok) {
+    throw new Error(`Google Health oxygen saturation fetch failed: ${res.status} ${await res.text()}`);
+  }
+  const data = (await res.json()) as OxygenDataPointsResponse;
+  const points = data.dataPoints ?? [];
+  if (points.length === 0) return null;
+
+  const latest = points[0];
+  const percentage = latest.dailyOxygenSaturation?.averagePercentage;
+  if (percentage == null) {
+    throw new Error(
+      `Unexpected daily-oxygen-saturation response shape: ${JSON.stringify(latest)}`
+    );
+  }
+  return Number(percentage);
+}

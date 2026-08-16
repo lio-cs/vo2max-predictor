@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFollowUpAnswer, type CoachDecision, type FollowUpMessage, type RecommendedActionType } from "@/lib/geminiCoach";
-import type { StopBangResult, FitnessContext, OsaRiskLevel, FitnessTrend, FitnessLevel } from "@/lib/riskTrajectory";
+import type {
+  StopBangResult,
+  FitnessContext,
+  OsaRiskLevel,
+  FitnessTrend,
+  FitnessLevel,
+  OxygenContext,
+  OxygenLevel,
+} from "@/lib/riskTrajectory";
 import { checkRateLimit, getClientKey } from "@/lib/rateLimit";
 import { getValidSession } from "@/lib/googleHealth";
 
@@ -8,12 +16,14 @@ const RISK_LEVELS: OsaRiskLevel[] = ["low", "intermediate", "high"];
 const ACTION_TYPES: RecommendedActionType[] = ["monitor", "mention_to_doctor", "see_doctor_soon"];
 const TRENDS: FitnessTrend[] = ["improving", "stable", "declining", "insufficient_data"];
 const FITNESS_LEVELS: FitnessLevel[] = ["below_average", "average", "above_average"];
+const OXYGEN_LEVELS: OxygenLevel[] = ["normal", "borderline", "low"];
 const MAX_QUESTION_LENGTH = 300;
 const MAX_HISTORY_MESSAGES = 20;
 
 interface AskRequestBody {
   stopBang: StopBangResult;
   fitness: FitnessContext;
+  oxygen: OxygenContext | null;
   decision: CoachDecision;
   history: FollowUpMessage[];
   question: string;
@@ -35,6 +45,13 @@ function isFitnessContext(value: unknown): value is FitnessContext {
     FITNESS_LEVELS.includes(v.fitnessLevel as FitnessLevel) &&
     TRENDS.includes(v.trend as FitnessTrend)
   );
+}
+
+function isOxygenContext(value: unknown): value is OxygenContext | null {
+  if (value === null) return true;
+  if (typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return typeof v.percentage === "number" && OXYGEN_LEVELS.includes(v.level as OxygenLevel);
 }
 
 function isCoachDecision(value: unknown): value is CoachDecision {
@@ -66,6 +83,7 @@ export function parseAskBody(body: unknown): AskRequestBody | null {
   const v = body as Record<string, unknown>;
   if (!isStopBangResult(v.stopBang)) return null;
   if (!isFitnessContext(v.fitness)) return null;
+  if (!isOxygenContext(v.oxygen)) return null;
   if (!isCoachDecision(v.decision)) return null;
   if (!isHistory(v.history)) return null;
   if (typeof v.question !== "string" || v.question.trim().length === 0 || v.question.length > MAX_QUESTION_LENGTH) {

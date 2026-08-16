@@ -5,6 +5,8 @@ import {
   assessFitnessContext,
   classifyFitnessLevel,
   detectMilestone,
+  classifyOxygenLevel,
+  assessOxygenContext,
   type StopBangAnswers,
   type VO2maxHistoryPoint,
 } from "./riskTrajectory";
@@ -207,5 +209,30 @@ describe("detectMilestone", () => {
   it("a new high takes precedence over reporting it as a streak", () => {
     const result = detectMilestone(history(38, 39, 40, 41));
     expect(result?.type).toBe("new_high");
+  });
+});
+
+describe("classifyOxygenLevel", () => {
+  it("classifies normal at and above 95%", () => {
+    expect(classifyOxygenLevel(95)).toBe("normal");
+    expect(classifyOxygenLevel(98)).toBe("normal");
+  });
+
+  it("classifies borderline between 90% and 94%", () => {
+    expect(classifyOxygenLevel(94)).toBe("borderline");
+    expect(classifyOxygenLevel(90)).toBe("borderline");
+  });
+
+  it("classifies low below 90%", () => {
+    expect(classifyOxygenLevel(89)).toBe("low");
+    expect(classifyOxygenLevel(80)).toBe("low");
+  });
+});
+
+describe("assessOxygenContext", () => {
+  it("bundles the percentage with its classification", () => {
+    expect(assessOxygenContext(96)).toEqual({ percentage: 96, level: "normal" });
+    expect(assessOxygenContext(92)).toEqual({ percentage: 92, level: "borderline" });
+    expect(assessOxygenContext(85)).toEqual({ percentage: 85, level: "low" });
   });
 });
