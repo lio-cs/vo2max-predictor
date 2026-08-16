@@ -885,6 +885,54 @@ hue-family theory each time, rather than directly through visible chroma. This r
 targets that directly — carrying real color instead of just shifting which neutral it's closest
 to — take that as the signal if another round is needed, not "try yet another neutral."
 
+## 10l. Aug 16 — full day summary
+
+Two tracks landed on `master` today, each documented in detail above — this section is the
+single scannable entry point tying them together, mirroring §10's role for the Aug 10–11 session.
+
+**Feature track (Lionel, §10d/§10e/§10g):**
+- Deployment documented: live on Cloud Run, continuous deploy from `master` (§10c/§10d)
+- SpO2 (blood oxygen) added as a second wearable metric, supporting context only — same
+  non-diagnostic treatment as VO2max
+- Personalized messaging by age-relative fitness level; trend chart + milestone detection
+- Fixed a real Firestore multi-user collision bug (all users were sharing one log document);
+  added GDPR consent + privacy policy draft
+- Data-separation review for Digvijay: confirmed identity was already kept out of what reaches
+  Gemini, found and closed one real gap (PII redaction on free-text follow-up questions)
+- Play Store publishing investigated and ruled out as infeasible before the deadline
+
+**UI/UX track (Jyrah, §10h–§10k, this session):**
+- New VO2max age/sex context block (`lib/vo2maxRanges.ts` + `app/VO2MaxContext.tsx`), per
+  Jyrah's own implementation-ready spec — collapsible, ACSM age/sex reference ranges, reconciled
+  against the existing (and now-removed) ratio-based fitness classifier so the number shown to
+  the user and the number fed to Gemini's prompt can't disagree (§10h)
+- Follow-up chat pulled out of the coaching-result card into its own card, with a height-capped,
+  auto-scrolling message thread — the actual fix for the page growing unboundedly as a
+  conversation lengthens, not just a visual split. "Why this matters" collapsed into a toggle
+  for the same reason (§10i)
+- New wearable-picker page (`app/connect/page.tsx`) ahead of a planned Apple Watch/other-wearable
+  push — Fitbit real and clickable, everything else a disabled "Coming soon" card, explicitly a
+  roadmap signal and not a build commitment (§10j)
+- Four rounds on the light-mode block color (`--paper-alt`) in one day: pale mint → navy-gray →
+  warm taupe → landed on a muted tint of `--accent` itself (§10j/§10k) — the fix that actually
+  worked was deriving the color from the accent teal rather than from a neutral, which is worth
+  remembering if this token gets revisited again
+- Static preview kept in lockstep with every change: `https://claude.ai/code/artifact/dc8308e4-fcac-4057-ac65-ef90d5424e80`
+  (stable URL, redeployed after each commit) — the practical way to see UI changes without
+  Fitbit OAuth access, since only Lionel currently has a Test User account on the live site
+
+**State at end of day:** `master` is at `581fb34`; Cloud Run has auto-deployed every push;
+neither track's changes have been verified with a local `npm run build`/`tsc`/`eslint`/`npm test`
+pass in this working environment (no Node/npm installed here) — that verification is still
+worth doing from a machine that has Node before treating today's work as demo-ready.
+
+**Carried into tomorrow (Aug 17, deadline 1:00pm PT):** same open items as §10d/§10e's lists —
+Workalyzer link and APK-builds clarification (Eangelica), human legal review of
+`DISCLAIMER_DRAFT.md` and the privacy policy draft, demo recording, video script, and confirming
+with Eangelica whether the mock P&L slide is still needed alongside her real business pitch. New
+today: whether an "Apple Watch — Coming soon" card is honest roadmap signaling or overclaim for
+a hackathon demo audience is flagged in §10j for the team to weigh in on, not decided here.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
