@@ -864,6 +864,27 @@ manual-review-verified only. Worth a real `npm run build`/`tsc`/`eslint` pass, a
 with the team whether "Apple Watch (Coming soon)" reads as an honest roadmap signal or an
 overclaim for a hackathon demo audience — flagging it, not deciding it unilaterally.
 
+## 10k. Fourth pass on the block color — teal instead of neutral (Aug 16)
+
+`--paper-alt` in light mode, once more: "the beige block colors... too plain, try a muted teal
+like the starting page." Every attempt up through §10j (pale mint → navy-gray → warm taupe) kept
+the block color a near-neutral shade *within `--paper`'s own family* — different lightness, same
+essentially-no-hue idea. That consistently read as flat/plain because it never actually carried
+color identity, just varying shades of "not quite white." This pass inverts the approach: instead
+of deriving from `--paper`, `--paper-alt` (`#b7d6d4`) is now a muted tint of `--accent`
+(`#0f766e`) — the same teal already doing work on the landing page's CTA hover, glow, and
+gradient text — kept a step below `--accent-soft`'s brightness so badges/pills (risk tier,
+milestone pill) still visually pop against the new card background instead of blending in.
+`--hairline` (the border color) wasn't touched — never flagged as a problem in any round.
+
+Pushed as commit `a52b6d2`. Static preview republished to match.
+
+**Pattern worth naming for whoever picks this up next:** four rounds on one token in one day is a
+sign the actual ask ("make it feel less plain / more alive") was being solved indirectly through
+hue-family theory each time, rather than directly through visible chroma. This round finally
+targets that directly — carrying real color instead of just shifting which neutral it's closest
+to — take that as the signal if another round is needed, not "try yet another neutral."
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
