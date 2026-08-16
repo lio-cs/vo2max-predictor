@@ -84,8 +84,10 @@ rather than introducing a Python + LangChain service — see §8.
 
 **Jyrah — market analysis + UI/UX:**
 - ~~OSA-specific competitive/market scan~~ — **done Aug 11**, see §7a
-- UI/UX pass on `app/StopBangForm.tsx`, now that the OSA framing is settled so the copy/design
-  match — still open; feed §7a's positioning shift into it per Jyrah's own suggested next step
+- ~~UI/UX pass on `app/StopBangForm.tsx`~~ — **done Aug 15**, see §10f. Full Coach panel
+  redesign against the six-state spec, not just the form: spec-compliance audit, full-screen
+  responsive layout, formal navy/off-white/teal rebrand with a Fraunces display font, motion,
+  and minimalist icons on states 2/3/6.
 
 ## 5. Timeline & schedule (Aug 10 → Aug 17 deadline)
 
@@ -200,8 +202,8 @@ rather than introducing a Python + LangChain service — see §8.
       instructions to treat input data as data (not commands), output validation (non-empty,
       length-bounded) before use, and rate limiting (10 req/min per client) on `/api/coach`.
       Full auth + PII masking still explicitly deferred to phase two per Digvijay.
-- [ ] UI/UX pass on the new STOP-BANG form matching the OSA framing (Jyrah — the form works
-      but is functional/unstyled-beyond-basics, needs a real design pass)
+- [x] UI/UX pass on the new STOP-BANG form matching the OSA framing (Jyrah) — **done Aug 15**,
+      see §10f. Grew into a full Coach panel redesign, not just the form.
 - [x] Docker container for local/shared running — done Aug 11: multi-stage `Dockerfile` using
       `output: "standalone"`, verified the build produces the expected `.next/standalone`
       structure (Docker itself isn't installed in this sandbox to run a full `docker build`,
@@ -331,10 +333,9 @@ against Google's own roadmap on the same data.
   Every direct competitor screens from breathing/oxygen data; AeroCoach is the only one starting
   from VO2max. Narrower than the old pillar, but still genuinely defensible.
 
-**Still open:** the UI/UX audit of `app/StopBangForm.tsx` — this scan is the market-research
-half of that combined checklist item; Jyrah's own suggested next step is to feed both this scan
-and the marketing brief into that audit once it happens, so the positioning shift above shows
-up in the panel's copy, not just hypothetical landing-page copy.
+**Done Aug 15, see §10f:** the UI/UX audit of `app/StopBangForm.tsx` (and the rest of the Coach
+panel) — the positioning shift above (retire "zero new hardware," lead with the VO2max→OSA
+hook) is live in the actual copy, not just this scan.
 
 ## 8. OSA rework (Aug 11)
 
@@ -546,9 +547,9 @@ deadline. Two things worth flagging before the list itself:
 - [x] Figure out where the app is deployed + document the public URL/hosting config — done,
       see §10c
 - [ ] Follow the Outskill tutorial (today/tomorrow) — general guidance, not a build task
-- [ ] Finish the mobile web homepage, refine UI beyond bare-bones — largely addressed by
-      Jyrah's redesign already merged (Aug 15–16 commits); worth a dedicated mobile pass to
-      confirm
+- [x] Finish the mobile web homepage, refine UI beyond bare-bones — **done Aug 15**, see §10f.
+      Full-screen layout uses a `min-h-dvh` shell with a `max-w-2xl` centered column, so it
+      scales from phone to laptop off one codebase rather than needing a separate mobile pass.
 - [x] ~~Investigate Google Play Store publishing~~ — **resolved: infeasible before the
       deadline.** New developer accounts require a mandatory 14-day closed test with 12
       testers before production review is even possible, plus 3–14 more days of review after
@@ -655,6 +656,60 @@ Every step verified independently (`npm test`/`tsc`/`eslint`/`npm run build`) be
    which of the last two is actually still needed)
 3. Out of scope for the remaining time, per earlier discussion: Whisper voice-to-text, Apple
    HealthKit, Lovable/Manus
+
+## 10f. Coach panel UI/UX redesign sprint (Aug 15)
+
+Jyrah's full UI/UX pass on the Coach panel, working directly in the live repo (not a separate
+mockup) against `AEROCOACH_COACH_PANEL_UI_UX_SPEC.md`'s six-state design. Five commits, each
+verified before moving to the next since there's no local Node/npm in this environment — no
+`npm run build`/`tsc`/`eslint` this round, so changes leaned on careful manual review plus a
+parallel static HTML mockup kept in sync with the real components as a stand-in preview.
+
+1. **`f9adf8e` — spec-compliance audit.** Retired "VO2 Max Predictor" branding for AeroCoach;
+   dropped the raw "STOP-BANG X/8" numeric score and red/amber/emerald risk-tier coloring from
+   the result badge (spec explicitly bans numeric scores and warning colors); split
+   insufficient-data (state 3) from actual errors (state 6), each neutral/reassuring rather than
+   alarming; restructured the coaching result into what/why/next per spec §4.4; aligned
+   disclaimer wording across states 1 and 4.
+2. **`c3888d7` — full-screen responsive layout + better loading state.** Replaced the boxed
+   `max-w-md` card with a full-bleed `min-h-dvh` shell and a centered `max-w-2xl` column that
+   scales from phone to laptop, closer to a Gemini/Claude-style app frame (explicit ask: make it
+   feel full-screen on laptop like those chat UIs). Added `LoadingLines.tsx`, a reusable
+   rotating-status component (cycles through what's happening, falls back to a "still working"
+   message after ~9s) — replaces state 2's bare disabled button, reused for both the initial
+   Fitbit/Health fetch (`ConnectingState.tsx`, new Suspense fallback) and the Gemini coaching
+   call inside the form.
+3. **`454b584` — formal navy/off-white/teal rebrand + Fraunces display font.** Added Fraunces
+   (`next/font/google`) as a display face for the wordmark/hero/headings only — Geist Sans stays
+   the body font. Fixed a real bug along the way: `globals.css` hardcoded `font-family: Arial`
+   on `body`, silently overriding the Geist Sans that was already loaded. Replaced the flat
+   Tailwind zinc palette with semantic navy/off-white/teal design tokens (`paper`, `ink`,
+   `accent`, etc.) that swap light/dark automatically via the existing
+   `--background`/`--foreground` media-query pattern, removing the need for paired `dark:`
+   classes everywhere. Moved the marketing hero paragraph + disclaimer so they render only on
+   the not-connected landing state instead of repeating on every screen; added a small
+   persistent brand row (wordmark + live pulse dot) shown across the other states instead. Added
+   tasteful motion — gradient-accent hero text, a slow breath-paced glow behind the hero,
+   animated equalizer bars on the VO2max stat — all disabled under `prefers-reduced-motion`.
+4. **`b6f68e9` → `c1d4209` — muted-surface color fix + minimalist icons.** First pass swapped the
+   original beige muted surface for a light teal tint; feedback was that it still clashed with
+   the off-white base, so the surface color (`--paper-alt`) was moved to the navy family instead
+   (`#e2e7e8` light / `#13293c` dark) — teal (`--accent`/`--accent-soft`) now stays reserved
+   purely for buttons, badges, and icons rather than doing double duty as a neutral surface.
+   Added small single-stroke SVG icons with no new icon dependency: an animated pulse/waveform
+   line on the connecting state (2), a nights-progress dot row on the insufficient-data state
+   (3), and a calm retry-arrow on the error state (6). State 1 (the landing page) was
+   deliberately left untouched per explicit feedback that it was already right.
+
+**Files touched:** `app/page.tsx`, `app/StopBangForm.tsx`, `app/FollowUpChat.tsx`,
+`app/layout.tsx`, `app/globals.css`, plus two new components (`app/LoadingLines.tsx`,
+`app/ConnectingState.tsx`). All five commits pushed to `master`; Cloud Run's continuous
+deployment (§10c) picked each one up automatically.
+
+**Not done this round, worth flagging:** no local build/lint/type-check was possible (no
+Node/npm in this working environment), so verification was manual review only — worth a real
+`npm run build`/`tsc`/`eslint` pass from a machine that has Node before this is treated as fully
+verified, same caution as the Docker build note in §6.
 
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
