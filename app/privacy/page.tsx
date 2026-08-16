@@ -50,6 +50,26 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
+          <h2 className="font-display text-base font-medium text-ink">Keeping your identity separate from your health data</h2>
+          <p className="mt-2">
+            What we send to Gemini is deliberately limited to your screening score, risk tier, and fitness/oxygen
+            numbers — never your name, email, or Google account identity, and never your login credentials. The
+            Gemini API call itself is made by our server using our own app credentials, not anything tied to your
+            personal Google account, so Google&apos;s API doesn&apos;t see your account identity on that call
+            either. Where your history is linked across visits (so your fitness trend can build over time), it&apos;s
+            linked via a one-way hashed key derived from your session, not your account itself or anything
+            reversible back to it.
+          </p>
+          <p className="mt-2">
+            The one place free-form text reaches Gemini at all is the follow-up chat, since that&apos;s the only
+            field you can type anything into. Before anything you type there is sent, we automatically scrub
+            patterns that look like an email address or phone number. This is a best-effort filter, not a
+            guarantee — it can&apos;t reliably catch a name typed into a sentence, so please avoid typing anything
+            personally identifying into the chat regardless.
+          </p>
+        </section>
+
+        <section>
           <h2 className="font-display text-base font-medium text-ink">Health data &amp; special category processing</h2>
           <p className="mt-2">
             Under GDPR, information about your fitness and OSA screening result counts as{" "}

@@ -30,6 +30,7 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
   const [input, setInput] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [redactionNotice, setRedactionNotice] = useState(false);
 
   async function ask(question: string) {
     const trimmed = question.trim();
@@ -58,6 +59,7 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
       if (nextSuggestions && nextSuggestions.length > 0) {
         setSuggestions(nextSuggestions);
       }
+      if (data.redacted) setRedactionNotice(true);
       setStatus("idle");
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : String(err));
@@ -105,6 +107,12 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
 
       {errorMessage && (
         <p className="rounded-lg bg-paper-alt px-3 py-2 text-xs text-ink-soft">{errorMessage}</p>
+      )}
+
+      {redactionNotice && (
+        <p className="rounded-lg bg-paper-alt px-3 py-2 text-[11px] text-ink-faint">
+          We removed what looked like contact info (email/phone) from a message before sending it to the AI.
+        </p>
       )}
 
       <form

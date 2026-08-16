@@ -711,6 +711,37 @@ Node/npm in this working environment), so verification was manual review only �
 `npm run build`/`tsc`/`eslint` pass from a machine that has Node before this is treated as fully
 verified, same caution as the Docker build note in §6.
 
+## 10g. Data separation from identity (Digvijay's feedback, Aug 16)
+
+Digvijay flagged: medical data should be separated from the user, to prevent it being read and
+linked by Gemini. Checked the actual data flow before responding rather than assuming either
+"already fine" or "needs a rebuild":
+
+**Already true, confirmed by re-reading the code:**
+- Gemini never receives your name, email, Google account ID, session cookie, or OAuth token —
+  `lib/geminiCoach.ts`'s prompts contain only computed metrics (STOP-BANG score/tier, VO2max,
+  SpO2, fitness trend/history dates)
+- The Gemini API call is made server-side using the app's own API key, not anything tied to the
+  end user's Google account — so Google's Gemini endpoint doesn't see the user's identity on
+  that call either
+- Cross-session linking (for trend/history) happens through `getUserKey()` — a one-way SHA-256
+  hash of the OAuth refresh token, never the token or an identity itself
+
+**One real gap found and fixed:** the follow-up chat is the only surface accepting free-form
+text — someone could type an email or phone number directly into a question, and it would have
+flowed to Gemini (and into the LangFuse trace) unfiltered. Added `lib/piiRedaction.ts`: a
+best-effort scrub of email/phone patterns run on the user's question and their own prior chat
+turns before the prompt is built. Deliberately does **not** attempt name-detection — a
+regex/keyword guesser for names would be unreliable enough to create false confidence, so the
+disclosure is honest about that limit instead of overclaiming coverage. Surfaced to the user via
+a small notice in `FollowUpChat.tsx` when redaction actually fires.
+
+`app/privacy/page.tsx` updated with a new "Keeping your identity separate from your health data"
+section explaining all of the above in plain English — this is the direct answer to Digvijay's
+concern, not just a code change.
+
+Verified: 104 tests passing (7 new, for the redaction module), lint clean, build clean.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting

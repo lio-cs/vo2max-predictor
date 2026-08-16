@@ -1,6 +1,7 @@
 import { startActiveObservation } from "@langfuse/tracing";
 import type { OsaRiskLevel, StopBangResult, FitnessContext, OxygenContext } from "./riskTrajectory";
 import type { CoachLogEntry } from "./coachLog";
+import { redactPotentialPII } from "./piiRedaction";
 
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -339,7 +340,7 @@ export async function getFollowUpAnswer(input: {
   decision: CoachDecision;
   history: FollowUpMessage[];
   question: string;
-}): Promise<FollowUpAnswer> {
+}): Promise<FollowUpAnswer & { redacted: boolean }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("Missing required env var: GEMINI_API_KEY");
@@ -348,8 +349,19 @@ export async function getFollowUpAnswer(input: {
     throw new Error(`Question must be 1-${MAX_QUESTION_LENGTH} characters`);
   }
 
+  // Scrub mechanically-detectable PII (email/phone) out of the user's own text — the only
+  // free-form input in this whole flow — before it reaches the prompt built below, so it never
+  // reaches Gemini or the LangFuse trace logged just after this.
+  const questionRedaction = redactPotentialPII(input.question);
+  const redactedHistory = input.history.map((m) =>
+    m.role === "user" ? { ...m, text: redactPotentialPII(m.text).text } : m
+  );
+  const historyRedacted = input.history.some((m, i) => m.role === "user" && m.text !== redactedHistory[i].text);
+  const sanitizedInput = { ...input, question: questionRedaction.text, history: redactedHistory };
+  const redacted = questionRedaction.redacted || historyRedacted;
+
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
-  const prompt = buildFollowUpPrompt(input);
+  const prompt = buildFollowUpPrompt(sanitizedInput);
 
   return startActiveObservation(
     "gemini-follow-up-answer",
@@ -413,7 +425,7 @@ export async function getFollowUpAnswer(input: {
           : undefined,
       });
 
-      return result;
+      return { ...result, redacted };
     },
     { asType: "generation" }
   );
