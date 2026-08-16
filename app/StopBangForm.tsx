@@ -172,58 +172,74 @@ export function StopBangForm({ age }: StopBangFormProps) {
   const { fitness, oxygen, stopBang, decision, history, milestone } = result;
 
   return (
-    <div className="space-y-4 rounded-xl border border-hairline bg-paper-alt p-5">
-      <div className="flex items-center justify-between">
-        <p className="font-display text-base font-medium text-ink">AeroCoach</p>
-        <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-medium text-accent-ink capitalize">
-          {stopBang.riskLevel} risk
-        </span>
-      </div>
+    <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-hairline bg-paper-alt p-5">
+        <div className="flex items-center justify-between">
+          <p className="font-display text-base font-medium text-ink">AeroCoach</p>
+          <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-medium text-accent-ink capitalize">
+            {stopBang.riskLevel} risk
+          </span>
+        </div>
 
-      <div>
-        <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">
-          What your data&apos;s been saying
+        <div>
+          <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">
+            What your data&apos;s been saying
+          </p>
+          <p className="mt-1 text-sm text-ink">{decision.riskExplanation}</p>
+        </div>
+
+        <details className="group rounded-lg bg-paper px-3 py-2.5">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-xs font-semibold tracking-wide text-ink-faint uppercase [&::-webkit-details-marker]:hidden">
+            Why this matters
+            <ChevronIcon className="h-3.5 w-3.5 shrink-0 text-accent transition-transform group-open:rotate-180" />
+          </summary>
+          <p className="mt-2 text-sm text-ink">{WHY_THIS_MATTERS}</p>
+        </details>
+
+        <div>
+          <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">What to do next</p>
+          <div className="mt-1 rounded-lg bg-paper p-3 text-sm">
+            <p className="font-medium text-ink capitalize">{decision.recommendedAction.type.replace(/_/g, " ")}</p>
+            <p className="mt-1 text-xs text-ink-soft">{decision.recommendedAction.rationale}</p>
+          </div>
+        </div>
+
+        <p className="text-xs text-ink-soft italic">{decision.motivationalNudge}</p>
+
+        <div>
+          <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">Your trend</p>
+          <div className="mt-1 rounded-lg bg-paper p-3">
+            <TrendChart history={history} milestone={milestone} />
+          </div>
+        </div>
+
+        <VO2MaxContext vo2max={fitness.vo2max} age={age} sex={answers.male ? "male" : "female"} />
+
+        <p className="text-[10px] text-ink-faint">
+          VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")})
+          {oxygen ? ` · Blood oxygen ${oxygen.percentage}% (${oxygen.level})` : ""} — general fitness
+          context, separate from your OSA risk tier above, not evidence of OSA risk itself. AeroCoach is a
+          wellness and educational tool, not a diagnostic medical device. It doesn&apos;t replace a physician
+          or a clinical sleep study — it helps you know when it&apos;s time to ask for one.
         </p>
-        <p className="mt-1 text-sm text-ink">{decision.riskExplanation}</p>
+
+        <button onClick={() => setResult(null)} className="text-xs text-ink-faint underline">
+          Redo screening
+        </button>
       </div>
 
-      <div>
-        <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">Why this matters</p>
-        <p className="mt-1 text-sm text-ink">{WHY_THIS_MATTERS}</p>
-      </div>
-
-      <div>
-        <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">What to do next</p>
-        <div className="mt-1 rounded-lg bg-paper p-3 text-sm">
-          <p className="font-medium text-ink capitalize">{decision.recommendedAction.type.replace(/_/g, " ")}</p>
-          <p className="mt-1 text-xs text-ink-soft">{decision.recommendedAction.rationale}</p>
-        </div>
-      </div>
-
-      <p className="text-xs text-ink-soft italic">{decision.motivationalNudge}</p>
-
-      <div>
-        <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">Your trend</p>
-        <div className="mt-1 rounded-lg bg-paper p-3">
-          <TrendChart history={history} milestone={milestone} />
-        </div>
-      </div>
-
-      <VO2MaxContext vo2max={fitness.vo2max} age={age} sex={answers.male ? "male" : "female"} />
-
-      <p className="text-[10px] text-ink-faint">
-        VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")})
-        {oxygen ? ` · Blood oxygen ${oxygen.percentage}% (${oxygen.level})` : ""} — general fitness
-        context, separate from your OSA risk tier above, not evidence of OSA risk itself. AeroCoach is a
-        wellness and educational tool, not a diagnostic medical device. It doesn&apos;t replace a physician
-        or a clinical sleep study — it helps you know when it&apos;s time to ask for one.
-      </p>
-
-      <button onClick={() => setResult(null)} className="text-xs text-ink-faint underline">
-        Redo screening
-      </button>
-
+      {/* Separate card, not nested in the result card above — the thread grows as the user asks
+          follow-ups, and FollowUpChat caps its own height with internal scroll (see that file),
+          so this outer card stays a fixed, predictable size instead of the whole page growing. */}
       <FollowUpChat stopBang={stopBang} fitness={fitness} oxygen={oxygen} decision={decision} />
     </div>
+  );
+}
+
+function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden="true">
+      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }

@@ -40,7 +40,7 @@ export default async function Home({
           <div className="relative mt-10">
             <div
               aria-hidden
-              className="animate-breathe absolute -top-16 -left-10 h-56 w-56 rounded-full bg-accent/25 blur-3xl"
+              className="animate-breathe absolute -top-16 -left-10 h-56 w-56 rounded-full bg-accent-glow/25 blur-3xl"
             />
             <h1 className="relative font-display text-4xl font-medium leading-[1.1] tracking-tight text-ink sm:text-5xl">
               Your Fitbit already knows{" "}

@@ -15,6 +15,11 @@
   --accent: #0f766e;
   --accent-soft: #d3ede8;
   --accent-ink: #0b4f49;
+  /* Used only for decorative glow (hero blob, gradient text) — the darker --accent above stays
+     the text/button color for contrast against off-white. Same vivid teal dark mode's --accent
+     already uses, so the light-mode "aura" reads with the same pop dark mode gets for free from
+     a bright color sitting on a near-black background. */
+  --accent-glow: #2dd4bf;
 }
 
 @theme inline {
@@ -33,6 +38,7 @@
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
+  --color-accent-glow: var(--accent-glow);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -49,6 +55,8 @@
     --accent: #2dd4bf;
     --accent-soft: #123832;
     --accent-ink: #8be0d6;
+    /* Already vivid against the dark paper — glow and text/button accent are the same color. */
+    --accent-glow: #2dd4bf;
   }
 }
 
@@ -62,7 +70,7 @@ body {
    reads clearly if background-clip isn't supported (falls back to solid accent color). */
 .text-gradient-accent {
   color: var(--accent);
-  background: linear-gradient(90deg, var(--accent), var(--ink));
+  background: linear-gradient(90deg, var(--accent-glow), var(--ink));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

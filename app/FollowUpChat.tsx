@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -31,6 +31,13 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [redactionNotice, setRedactionNotice] = useState(false);
+  const threadEndRef = useRef<HTMLDivElement>(null);
+
+  // Keeps the latest message in view as the thread grows, instead of the user having to scroll
+  // down inside the capped-height thread themselves after every answer.
+  useEffect(() => {
+    threadEndRef.current?.scrollIntoView({ block: "end" });
+  }, [messages.length, status]);
 
   async function ask(question: string) {
     const trimmed = question.trim();
@@ -69,10 +76,12 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
 
   return (
     <div className="space-y-3 rounded-xl border border-hairline bg-paper p-4">
-      <p className="text-xs font-semibold text-ink-soft">Ask AeroCoach a follow-up</p>
+      <p className="font-display text-base font-medium text-ink">Ask AeroCoach a follow-up</p>
 
       {messages.length > 0 && (
-        <div className="space-y-2">
+        // Capped height + internal scroll so a long conversation stays a fixed-size panel
+        // instead of pushing the rest of the page down indefinitely — matters most on phone.
+        <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
           {messages.map((m, i) => (
             <div
               key={i}
@@ -88,6 +97,7 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
               Thinking…
             </div>
           )}
+          <div ref={threadEndRef} />
         </div>
       )}
 
