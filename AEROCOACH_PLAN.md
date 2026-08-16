@@ -557,10 +557,15 @@ deadline. Two things worth flagging before the list itself:
 **B. New feature requests raised in discussion**
 - [ ] SpO2 as a second metric (Digvijay) — not currently pulled at all; unverified whether
       Fitbit even exposes this via the Google Health API; real scope, not a quick add
-- [ ] Personalized messaging by age/VO2max range (Digvijay) — moderate effort, extends
-      `lib/geminiCoach.ts` prompts
-- [ ] Trend graphs / milestones UI (Lionel) — moderate frontend effort; blocked on the
-      Firestore multi-user bug below being fixed first if it's meant to show real trend data
+- [x] Personalized messaging by age/VO2max range (Digvijay) — **done Aug 16**: added
+      deterministic `classifyFitnessLevel` (below/average/above_average, standard
+      exercise-physiology norm, not a disease-risk claim — kept separate from the OSA risk
+      tier same as everything else fitness-related) and updated the coaching prompts to
+      personalize the motivational nudge using fitness level + trend together
+- [x] Trend graphs / milestones UI (Lionel) — **done Aug 16**: `app/TrendChart.tsx`, a simple
+      bar chart of VO2max history, plus deterministic milestone detection (new high / 3+ day
+      improving streak) in `lib/riskTrajectory.ts`. Landed after the Firestore fix below, as
+      expected.
 - [ ] Voice-to-text via Whisper (Eangelica) — new third-party integration, real scope, not
       feasible in the remaining time
 - [ ] Apple HealthKit/Apple Watch support (Eangelica) — currently Fitbit/Google Health only;
@@ -578,20 +583,23 @@ deadline. Two things worth flagging before the list itself:
 - [x] PII/HIPAA exposure — **answered, and the app is clean**: no name, email, or any direct
       identifier anywhere in the pipeline (session cookie, Firestore, Gemini, LangFuse) — all
       of it is de-identified health metrics only.
-- [ ] **GDPR-specific compliance** (team operates in Europe) — genuinely not addressed: no
-      privacy policy page, no explicit cookie-consent/legal-basis statement for the session
-      cookie. Separate gap from the medical disclaimer, still open.
+- [x] **GDPR-specific compliance** (team operates in Europe) — **draft done Aug 16**:
+      `app/privacy/page.tsx` (special-category health data legal basis, cookies, third-party
+      data sharing, international transfers, data retention — honestly flagged where real gaps
+      remain, e.g. no real deletion mechanism yet) plus an explicit consent checkbox required
+      before submitting the screening form in `app/StopBangForm.tsx`. Same status as
+      `DISCLAIMER_DRAFT.md` — a real draft, not a substitute for actual legal review.
 - [ ] Human legal/compliance read of `DISCLAIMER_DRAFT.md` — still outstanding since Aug 12
 - [x] "Advisor, not doctor" liability framing (Digvijay) — **already done**: this is the entire
       premise of `DISCLAIMER_DRAFT.md` and the "never diagnose" enforcement in
       `lib/geminiCoach.ts`, tested via `validateGeminiCopy`/`validateFollowUpAnswer`
 
 **D. Bugs/gaps found while researching this meeting**
-- [ ] **Firestore multi-user collision** — `lib/coachLog.ts`'s `LOG_DOC_ID = "default"` means
-      every user's coaching history writes to the same single document, a leftover from the
-      single-user design. Now that Jyrah has real Test User access too, histories can mix.
-      Not a privacy leak (still no identifiers), but a real data-integrity bug. Needs a
-      per-session/per-user key to fix properly.
+- [x] **Firestore multi-user collision** — **fixed Aug 16**: `lib/session.ts`'s new
+      `getUserKey()` derives a stable, non-identifying key (SHA-256 hash of the OAuth refresh
+      token, truncated — never the raw token itself) to scope each user's logs in Firestore,
+      replacing the old fixed `LOG_DOC_ID = "default"`. `lib/coachLog.ts` and
+      `app/api/coach/route.ts` updated accordingly, tested.
 - [ ] Workalyzer link — still waiting on Eangelica, unresolved since Aug 9
 
 **E. Carried forward, still open**
