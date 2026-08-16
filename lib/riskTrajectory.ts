@@ -12,6 +12,9 @@
  * predicting OSA. VO2max trend is surfaced as separate supporting context only.
  */
 
+import { getVO2MaxRangeContext, type Sex } from "./vo2maxRanges";
+export type { Sex };
+
 export interface StopBangAnswers {
   snoring: boolean;
   tiredness: boolean;
@@ -86,18 +89,6 @@ export function peerAverageVo2max(age: number): number {
 
 export type FitnessLevel = "below_average" | "average" | "above_average";
 
-/**
- * Age-relative VO2max categorization — a standard, well-established exercise-physiology
- * comparison (VO2max-for-age norms), not a disease-risk claim, so it doesn't carry the same
- * evidence-base caution as the OSA risk tier above. Thresholds are deliberately the same
- * ratio bands used for general fitness categorization elsewhere in sports-medicine literature.
- */
-export function classifyFitnessLevel(ratioToPeerAverage: number): FitnessLevel {
-  if (ratioToPeerAverage < 0.85) return "below_average";
-  if (ratioToPeerAverage > 1.15) return "above_average";
-  return "average";
-}
-
 export interface FitnessContext {
   vo2max: number;
   peerAverageVo2max: number;
@@ -109,8 +100,19 @@ export interface FitnessContext {
 /**
  * Fitness context is presented as general health background alongside the STOP-BANG result —
  * never as a factor that changes the OSA risk tier itself.
+ *
+ * fitnessLevel is age/sex-band-derived (see getVO2MaxRangeContext in vo2maxRanges.ts) rather
+ * than the coarser sex-unspecified peer-average ratio, so it matches what VO2MaxContext.tsx
+ * shows the user directly — one source of truth for "below/average/above average," even though
+ * peerAverageVo2max/ratioToPeerAverage (a separate, coarser age-only comparison) are still
+ * surfaced to Gemini as supporting numeric context.
  */
-export function assessFitnessContext(vo2max: number, age: number, recentVo2max: number[]): FitnessContext {
+export function assessFitnessContext(
+  vo2max: number,
+  age: number,
+  recentVo2max: number[],
+  sex: Sex
+): FitnessContext {
   const peerAverage = peerAverageVo2max(age);
   const ratio = vo2max / peerAverage;
 
@@ -127,7 +129,7 @@ export function assessFitnessContext(vo2max: number, age: number, recentVo2max: 
     vo2max,
     peerAverageVo2max: Math.round(peerAverage * 10) / 10,
     ratioToPeerAverage: Math.round(ratio * 100) / 100,
-    fitnessLevel: classifyFitnessLevel(ratio),
+    fitnessLevel: getVO2MaxRangeContext(vo2max, age, sex).band,
     trend,
   };
 }

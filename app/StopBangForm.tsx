@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FollowUpChat } from "./FollowUpChat";
 import { LoadingLines } from "./LoadingLines";
 import { TrendChart } from "./TrendChart";
+import { VO2MaxContext } from "./VO2MaxContext";
 
 interface StopBangAnswers {
   snoring: boolean;
@@ -58,7 +59,11 @@ const WHY_THIS_MATTERS =
   "It's not something your fitness tracker can diagnose — but the patterns it's picking up are " +
   "worth a closer look.";
 
-export function StopBangForm() {
+interface StopBangFormProps {
+  age: number;
+}
+
+export function StopBangForm({ age }: StopBangFormProps) {
   const [answers, setAnswers] = useState<StopBangAnswers>(DEFAULT_ANSWERS);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -203,6 +208,8 @@ export function StopBangForm() {
           <TrendChart history={history} milestone={milestone} />
         </div>
       </div>
+
+      <VO2MaxContext vo2max={fitness.vo2max} age={age} sex={answers.male ? "male" : "female"} />
 
       <p className="text-[10px] text-ink-faint">
         VO2max {fitness.vo2max} mL/kg/min (trend: {fitness.trend.replace(/_/g, " ")})

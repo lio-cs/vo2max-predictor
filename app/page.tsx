@@ -204,7 +204,7 @@ async function Result() {
       </p>
 
       {process.env.GEMINI_API_KEY ? (
-        <StopBangForm />
+        <StopBangForm age={result.age} />
       ) : (
         <div className="rounded-xl border border-dashed border-hairline p-4 text-xs text-ink-faint">
           AeroCoach is disabled — set <code>GEMINI_API_KEY</code> in <code>.env.local</code> to

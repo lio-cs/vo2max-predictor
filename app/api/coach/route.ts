@@ -99,7 +99,8 @@ export async function POST(request: NextRequest) {
   const fitness = assessFitnessContext(
     vo2max,
     age,
-    recentLogs.map((entry) => entry.fitness.vo2max)
+    recentLogs.map((entry) => entry.fitness.vo2max),
+    stopBangAnswers.male ? "male" : "female"
   );
 
   // Optional/best-effort — many devices don't support SpO2 at all, and this isn't required

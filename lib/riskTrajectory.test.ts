@@ -3,7 +3,6 @@ import {
   computeStopBangScore,
   peerAverageVo2max,
   assessFitnessContext,
-  classifyFitnessLevel,
   detectMilestone,
   classifyOxygenLevel,
   assessOxygenContext,
@@ -119,60 +118,45 @@ describe("peerAverageVo2max", () => {
 
 describe("assessFitnessContext", () => {
   it("reports insufficient_data with fewer than 3 prior readings", () => {
-    const result = assessFitnessContext(40, 30, [39, 40]);
+    const result = assessFitnessContext(40, 30, [39, 40], "male");
     expect(result.trend).toBe("insufficient_data");
   });
 
   it("reports insufficient_data with zero prior readings", () => {
-    const result = assessFitnessContext(40, 30, []);
+    const result = assessFitnessContext(40, 30, [], "male");
     expect(result.trend).toBe("insufficient_data");
   });
 
   it("reports stable when the trend delta is small", () => {
-    const result = assessFitnessContext(40.3, 30, [40, 40.2, 40.3]);
+    const result = assessFitnessContext(40.3, 30, [40, 40.2, 40.3], "male");
     expect(result.trend).toBe("stable");
   });
 
   it("reports improving when VO2max is trending up", () => {
-    const result = assessFitnessContext(40, 30, [36, 38, 40]);
+    const result = assessFitnessContext(40, 30, [36, 38, 40], "male");
     expect(result.trend).toBe("improving");
   });
 
   it("reports declining when VO2max is trending down", () => {
-    const result = assessFitnessContext(38, 30, [42, 40, 38]);
+    const result = assessFitnessContext(38, 30, [42, 40, 38], "male");
     expect(result.trend).toBe("declining");
   });
 
   it("computes ratioToPeerAverage against the age-based peer average", () => {
-    const result = assessFitnessContext(41, 30, []);
+    const result = assessFitnessContext(41, 30, [], "male");
     // peerAverageVo2max(30) === 41, so ratio should be exactly 1
     expect(result.peerAverageVo2max).toBe(41);
     expect(result.ratioToPeerAverage).toBe(1);
   });
 
-  it("includes fitnessLevel derived from the ratio", () => {
-    // peerAverageVo2max(30) === 41; 30/41 ≈ 0.73, well under the 0.85 below_average threshold
-    expect(assessFitnessContext(30, 30, []).fitnessLevel).toBe("below_average");
-    // 41/41 === 1, squarely average
-    expect(assessFitnessContext(41, 30, []).fitnessLevel).toBe("average");
-    // 50/41 ≈ 1.22, over the 1.15 above_average threshold
-    expect(assessFitnessContext(50, 30, []).fitnessLevel).toBe("above_average");
-  });
-});
-
-describe("classifyFitnessLevel", () => {
-  it("classifies below-average at the boundary", () => {
-    expect(classifyFitnessLevel(0.84)).toBe("below_average");
-    expect(classifyFitnessLevel(0.85)).toBe("average");
-  });
-
-  it("classifies above-average at the boundary", () => {
-    expect(classifyFitnessLevel(1.15)).toBe("average");
-    expect(classifyFitnessLevel(1.16)).toBe("above_average");
-  });
-
-  it("classifies exactly at peer average as average", () => {
-    expect(classifyFitnessLevel(1.0)).toBe("average");
+  it("includes fitnessLevel derived from the age/sex ACSM band, not the peer-average ratio", () => {
+    // Age 30 male band (vo2maxRanges.ts): typicalLow 35, typicalHigh 39
+    expect(assessFitnessContext(30, 30, [], "male").fitnessLevel).toBe("below_average");
+    expect(assessFitnessContext(37, 30, [], "male").fitnessLevel).toBe("average");
+    expect(assessFitnessContext(45, 30, [], "male").fitnessLevel).toBe("above_average");
+    // Age 30 female band: typicalLow 28, typicalHigh 31 — same vo2max as the male "average"
+    // case above lands as above_average for female, confirming sex actually changes the band.
+    expect(assessFitnessContext(37, 30, [], "female").fitnessLevel).toBe("above_average");
   });
 });
 
