@@ -786,6 +786,48 @@ separate, coarser number still shown to Gemini as supporting context, not what d
 - All other implementation-checklist items from the spec (mount point, token reuse, age/sex
   threading, `classifyFitnessLevel` reconciliation) are done.
 
+## 10i. Follow-up chat separation + light-mode aura fix (Jyrah's feedback, Aug 16)
+
+Two pieces of live feedback on the just-shipped VO2max context block (§10h), both about the
+result screen reading poorly once a real conversation happens or on a real light-mode display —
+neither is visible from a single static screenshot, only from actually using the flow.
+
+**Follow-up chat was nested inside the result card.** `app/StopBangForm.tsx`'s result view and
+`FollowUpChat` shared one bordered `bg-paper-alt` box; as the user asks follow-ups the thread
+grows inside that same box, so the whole thing reads as one endless scroll — worst on phone.
+Fixed two ways together, not just one:
+- `FollowUpChat` is now a **separate sibling card** below the result, not nested inside it —
+  visually two distinct boxes, matching the "AeroCoach" / "Ask AeroCoach a follow-up" split that
+  was already implied by their separate headers.
+- The message thread itself is now **capped at `max-h-72` with internal scroll** and
+  auto-scrolls to the latest message — the card around it stays a fixed, predictable size no
+  matter how long the conversation gets, instead of the page growing indefinitely. This is the
+  actual fix for "way too long vertically," not just the card split.
+- `"Why this matters"` (static boilerplate, unlike the personalized sections around it) is now a
+  closed-by-default `<details>` toggle, same pattern as VO2MaxContext — a bit more vertical space
+  saved on the default view for anyone who doesn't need it explained.
+- Deliberately **did not** introduce a separate mobile-specific layout — same `max-w-2xl` single-
+  column shell scales from phone to laptop as before; the fix is capping/collapsing content, not
+  branching the structure by screen size, per the explicit "same layout on laptop and phone" ask.
+
+**Light-mode "aura" didn't pop the way dark mode's did.** The hero's breathing glow blob and
+gradient headline text both used `--accent` (`#0f766e`, deliberately muted for text/button
+contrast against off-white) — a dark, low-chroma teal glowing/gradient-fading against a light
+background just reads as a soft smudge, not a glow, unlike dark mode where the same role
+(`--accent: #2dd4bf`) is a bright color sitting on near-black and genuinely glows. Added a new
+`--accent-glow` token, used *only* for these two decorative spots — reuses dark mode's exact
+`#2dd4bf` in light mode too, so light mode gets the same vivid "aura" dark mode already had,
+without touching `--accent` itself (still the muted, WCAG-safer teal for actual buttons/badges/
+focus rings/text).
+
+**Files touched:** `app/StopBangForm.tsx`, `app/FollowUpChat.tsx`, `app/globals.css`,
+`app/page.tsx`. Pushed as commit `7d32e11`. Static preview (`AEROCOACH_PLAN.md`'s artifact
+workflow, not part of the repo) updated to match — see the "Coaching result" and "Follow-up
+chat" tabs.
+
+**Not done / open:** same caveat as §10f/§10h — no local Node/npm in this working environment,
+so this is manual-review-verified only, not `npm run build`/`tsc`/`eslint`/`npm test` verified.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
