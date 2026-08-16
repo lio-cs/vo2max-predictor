@@ -498,6 +498,112 @@ turn, falling back to the original static list only before the first message. 6 
 total) covering the new validation; `npm test`/`tsc`/`eslint`/`npm run build` all reverified
 clean after the change.
 
+## 10c. Deployment documentation (live as of Aug 15–16)
+
+**Live URL:** `https://vo2max-predictor-git-89170208601.europe-west1.run.app`
+
+| Setting | Value |
+|---|---|
+| Platform | Google Cloud Run |
+| GCP project number | `89170208601` |
+| Region | `europe-west1` |
+| Service name | `vo2max-predictor-git` |
+| Source | Continuous deployment via **Developer Connect**, connected directly to `github.com/lio-cs/vo2max-predictor`, branch `master` — every push to `master` triggers an automatic Cloud Build → deploy |
+| Build | Dockerfile-based (repo's own `Dockerfile`, `output: "standalone"`) |
+| Container port | `3000` (had to be set explicitly — Cloud Run defaults to expecting 8080, our Dockerfile uses 3000) |
+| Authentication | Allow public access (unauthenticated invocations) — required for a public-facing web app |
+| Ingress | All (public internet) |
+| Billing | Request-based (Always Free tier eligible) |
+| Scaling | Min 0 instances (scales to zero, $0 when idle — cold start on first request), Max 3 (cost/abuse ceiling, also mitigates the rate limiter's per-instance-only backstop, see §6 guardrails notes) |
+| Env vars set | `GEMINI_API_KEY`, `GOOGLE_HEALTH_CLIENT_ID`, `GOOGLE_HEALTH_CLIENT_SECRET`, `GOOGLE_HEALTH_REDIRECT_URI` (= the live URL + `/api/auth/callback`) — Firestore/LangFuse vars not set on this deployment, so both no-op there same as they optionally do locally |
+| OAuth consent screen | Still in **Testing** mode — only accounts on the Test users list (Google Cloud Console → APIs & Services → Google Auth Platform → Audience) can actually log in. Lionel and Jyrah added so far. Going to Production requires a full Google verification process for the Restricted Health scopes — confirmed this takes **several weeks** including an annual CASA security assessment, not remotely feasible before Aug 17. Staying in Testing + adding known testers individually is the Google-sanctioned path for a small team like this, not a workaround (see §10d C). |
+
+**Known deployment gotchas hit and fixed (worth knowing if redeploying from scratch):**
+1. First build failed: Cloud Build's service account (`89170208601-compute@developer.gserviceaccount.com`, the default Compute Engine SA, not the classic Cloud Build SA) needed `roles/developerconnect.readTokenAccessor` granted before it could read the newly-connected GitHub repo. One-time fix.
+2. App was unreachable (generic 500) until Container Port was explicitly set to 3000.
+3. Login worked but landed on the unroutable `http://0.0.0.0:3000` after Google's redirect — `app/api/auth/callback/route.ts` and `logout/route.ts` were deriving the redirect origin from `request.url`, which reflects the container's internal bind address behind Cloud Run's proxy, not the public host. Fixed by deriving origin from `GOOGLE_HEALTH_REDIRECT_URI` instead (already required to be the real public URL). See the Aug 15 commit `f87a7f7`.
+
+## 10d. Aug 16 team meeting — full action list
+
+Team meeting reviewed progress and discussed a broader set of directions ahead of the Aug 17
+deadline. Two things worth flagging before the list itself:
+
+- **Possible goal shift, needs resolving with the team, not assumed:** this meeting talks about
+  a real investor/YC business pitch and "maximizing points" across judging buckets — a
+  different bar than the "practice, not really competing" framing this whole plan (§1) has
+  operated under, which is also why `NARRATIVE_DRAFT.md` deliberately doesn't fabricate
+  traction. Worth an explicit answer from Eangelica/Digvijay on which framing is actually
+  intended before finalizing the submission narrative.
+- Several items below were already resolved by researching them directly (Gemini free-tier data
+  use, Play Store feasibility) or were already built before this meeting happened (the agentic
+  follow-up chat, advisor-not-diagnosis framing) — marked accordingly so effort doesn't get
+  spent re-solving what's done.
+
+**A. Meeting action items (verbatim)**
+- [ ] Eangelica: share the existing VO2max 1.0 APK builds with the team — unclear what this
+      refers to; possibly a separate/prior build outside this Next.js web app, needs clarifying
+- [ ] Eangelica: prepare the business pitch + traction narrative for the Aug 17 submission
+- [x] Figure out where the app is deployed + document the public URL/hosting config — done,
+      see §10c
+- [ ] Follow the Outskill tutorial (today/tomorrow) — general guidance, not a build task
+- [ ] Finish the mobile web homepage, refine UI beyond bare-bones — largely addressed by
+      Jyrah's redesign already merged (Aug 15–16 commits); worth a dedicated mobile pass to
+      confirm
+- [x] ~~Investigate Google Play Store publishing~~ — **resolved: infeasible before the
+      deadline.** New developer accounts require a mandatory 14-day closed test with 12
+      testers before production review is even possible, plus 3–14 more days of review after
+      that. Not close, not worth spending time on.
+
+**B. New feature requests raised in discussion**
+- [ ] SpO2 as a second metric (Digvijay) — not currently pulled at all; unverified whether
+      Fitbit even exposes this via the Google Health API; real scope, not a quick add
+- [ ] Personalized messaging by age/VO2max range (Digvijay) — moderate effort, extends
+      `lib/geminiCoach.ts` prompts
+- [ ] Trend graphs / milestones UI (Lionel) — moderate frontend effort; blocked on the
+      Firestore multi-user bug below being fixed first if it's meant to show real trend data
+- [ ] Voice-to-text via Whisper (Eangelica) — new third-party integration, real scope, not
+      feasible in the remaining time
+- [ ] Apple HealthKit/Apple Watch support (Eangelica) — currently Fitbit/Google Health only;
+      large scope, realistically roadmap-only for the narrative rather than built
+- [ ] Lovable/Manus tooling (Eangelica) — unclear concrete action; alternative app builders,
+      not obviously applicable on top of the existing tested Next.js codebase
+- [ ] "Digital nurse" / hospital-chain interface framing (Digvijay/Eangelica) — pitch
+      positioning idea, not a build item
+
+**C. Compliance/legal**
+- [x] Gemini free-tier training-data policy — **answered**: free-tier prompts/outputs can be
+      used to improve Google's products (including training) and may be human-reviewed; paid
+      tier (API or Vertex AI) is not used for training. EEA/UK/Switzerland get the no-training
+      terms even on the free tier.
+- [x] PII/HIPAA exposure — **answered, and the app is clean**: no name, email, or any direct
+      identifier anywhere in the pipeline (session cookie, Firestore, Gemini, LangFuse) — all
+      of it is de-identified health metrics only.
+- [ ] **GDPR-specific compliance** (team operates in Europe) — genuinely not addressed: no
+      privacy policy page, no explicit cookie-consent/legal-basis statement for the session
+      cookie. Separate gap from the medical disclaimer, still open.
+- [ ] Human legal/compliance read of `DISCLAIMER_DRAFT.md` — still outstanding since Aug 12
+- [x] "Advisor, not doctor" liability framing (Digvijay) — **already done**: this is the entire
+      premise of `DISCLAIMER_DRAFT.md` and the "never diagnose" enforcement in
+      `lib/geminiCoach.ts`, tested via `validateGeminiCopy`/`validateFollowUpAnswer`
+
+**D. Bugs/gaps found while researching this meeting**
+- [ ] **Firestore multi-user collision** — `lib/coachLog.ts`'s `LOG_DOC_ID = "default"` means
+      every user's coaching history writes to the same single document, a leftover from the
+      single-user design. Now that Jyrah has real Test User access too, histories can mix.
+      Not a privacy leak (still no identifiers), but a real data-integrity bug. Needs a
+      per-session/per-user key to fix properly.
+- [ ] Workalyzer link — still waiting on Eangelica, unresolved since Aug 9
+
+**E. Carried forward, still open**
+- [ ] Demo recording — now more important than before, since Play Store is off the table as a
+      way to show the live product working
+- [ ] Video script/storyboard
+- [ ] Mock P&L slide — possibly superseded by Eangelica's real business pitch; confirm with
+      her which one's actually needed before doing both
+- [x] Docker build/run local verification — **effectively resolved**: the live Cloud Run
+      deployment proves the Dockerfile works end-to-end, a separate local `docker run` isn't
+      adding new information at this point
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
