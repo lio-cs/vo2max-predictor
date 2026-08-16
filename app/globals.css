@@ -7,7 +7,10 @@
   /* Formal navy / off-white / teal palette. "ink" and "paper" swap roles between
      light and dark so bg-ink/text-paper buttons invert correctly in both themes. */
   --paper: #f5f2ea;
-  --paper-alt: #e9e3d4;
+  /* Muted tint of --accent below (not a same-family shade of --paper) — a plain neutral read
+     as flat, so blocks now carry visible teal identity, just desaturated enough to stay a
+     background rather than compete with --accent-soft's brighter badges/pills. */
+  --paper-alt: #b7d6d4;
   --ink: #101f2e;
   --ink-soft: #46566b;
   --ink-faint: #7c8798;
