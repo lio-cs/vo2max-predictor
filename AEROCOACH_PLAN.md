@@ -828,6 +828,42 @@ chat" tabs.
 **Not done / open:** same caveat as §10f/§10h — no local Node/npm in this working environment,
 so this is manual-review-verified only, not `npm run build`/`tsc`/`eslint`/`npm test` verified.
 
+## 10j. Light-mode block color fix + wearable-picker page (Jyrah's feedback, Aug 16)
+
+Two more pieces of feedback from actually looking at both themes side by side (screenshots),
+not visible from code review alone.
+
+**Light mode's block color didn't mesh with the off-white base, even after two prior attempts
+this session** (§10f's teal tint, §10h/i's navy-tinted gray). Comparing the two themes side by
+side made the actual cause clear: dark mode's blocks work because `--paper` (`#0a1420`) and
+`--paper-alt` (`#13293c`) are the *same navy family*, just different lightness — same undertone,
+different value. Both prior light-mode attempts changed the *hue* (to teal, then to a cool
+blue-gray) instead of staying in `--paper`'s own warm-cream family, so they always read as a
+mismatched color sitting on the page rather than a shade of it. Fixed by picking a muted, warm
+taupe in the same family as `--paper` (`#f5f2ea`) — `--paper-alt` is now `#e9e3d4`, applying the
+literal "same family, different lightness" principle that already made dark mode work. `--accent`
+untouched — explicit feedback was "I like the accent in not connected, keep it."
+
+**New wearable-picker page**, ahead of an actual plan to support Apple Watch/other wearables
+beyond Fitbit. `app/connect/page.tsx`: three cards (Fitbit — real, clickable, links to the
+existing `/api/auth/login` OAuth flow; Apple Watch and "More wearables" — disabled, "Coming
+soon" badge, no href). This is a visual roadmap signal only, consistent with how the rest of the
+build already handles roadmap-vs-shipped scope (§7a's positioning pillar 5, §10d/B's explicit
+"Apple HealthKit — large scope, roadmap-only for the narrative rather than built" decision) — it
+does **not** add real Apple Health integration, which stays out of scope for Aug 17. The landing
+page's CTA now points to `/connect` instead of straight to `/api/auth/login`, and its label
+changed from "Connect Fitbit" to "Get started" since Fitbit is no longer the only thing behind
+that button.
+
+**Files touched:** `app/globals.css`, `app/page.tsx`, new `app/connect/page.tsx`. Pushed as
+commit `3097f73`. Static preview updated to match — new "Choose wearable" tab, plus the color
+fix visible across every tab.
+
+**Not done / open:** same caveat as the rest of this pass — no local Node/npm here, so this is
+manual-review-verified only. Worth a real `npm run build`/`tsc`/`eslint` pass, and worth deciding
+with the team whether "Apple Watch (Coming soon)" reads as an honest roadmap signal or an
+overclaim for a hackathon demo audience — flagging it, not deciding it unilaterally.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
