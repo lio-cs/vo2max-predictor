@@ -742,6 +742,50 @@ concern, not just a code change.
 
 Verified: 104 tests passing (7 new, for the redaction module), lint clean, build clean.
 
+## 10h. VO2max age/sex context block (Jyrah's spec, Aug 16)
+
+Implemented `AEROCOACH_VO2MAX_CONTEXT_SPEC.md` — a compact, collapsible addition to the coaching
+result panel answering four things the coach wanted surfaced: a calm age-relative VO2max message,
+the healthy range for the user's own age, a note that VO2max shifts with habit change, and a
+reinforced advisor-not-doctor line. Same non-negotiables as everywhere else in the panel: no
+numeric OSA score, no warning colors, no diagnostic language, single-stroke SVG only.
+
+**Built as specified:**
+- `lib/vo2maxRanges.ts` — age/sex-synced VO2max reference ranges (ACSM Guidelines for Exercise
+  Testing and Prescription, 11th ed., Table 4.7; Cooper Institute ACLS data, ~80,000 adults).
+  `getVO2MaxRangeContext(vo2max, age, sex)` returns the typical range plus a below/average/above
+  band for the user's own bracket.
+- `app/VO2MaxContext.tsx` — closed-by-default `<details>` block (one line: VO2max + band message;
+  expands to the range, the habit-change note, and the disclaimer). No new client state, keyboard
+  accessible for free. Mounted in `app/StopBangForm.tsx` next to the existing trend chart, since
+  that's the first point in the flow where both `age` (now threaded down from `page.tsx`'s
+  `result.age`) and `sex` (the STOP-BANG gender answer, `answers.male`) are both available — no
+  new user input collected.
+- **One deviation from the spec's literal CSS**: the spec's `bg-paper-alt` for the block would
+  have sat invisibly inside its actual parent (`StopBangForm`'s result card is already
+  `bg-paper-alt`) — same problem the existing "Your trend" box already solved by using `bg-paper`
+  for contrast. Matched that existing pattern instead.
+
+**Reconciliation the spec explicitly asked for, done:** `classifyFitnessLevel` in
+`lib/riskTrajectory.ts` used a coarser, sex-unspecified peer-average ratio (0.85/1.15 bands) to
+produce the `fitnessLevel` that feeds Gemini's coaching prompt — a different classifier than the
+one this new block shows the user directly, which could have quietly disagreed with itself on
+screen. `assessFitnessContext` now takes a required `sex` parameter and delegates `fitnessLevel`
+to `getVO2MaxRangeContext`'s band, so there's one source of truth; `classifyFitnessLevel` is
+removed as dead code. `peerAverageVo2max`/`ratioToPeerAverage` are unaffected — they're a
+separate, coarser number still shown to Gemini as supporting context, not what drives the band.
+
+**Not done / open:**
+- No local `npm run build` / `tsc` / `eslint` / `npm test` — no Node/npm in this working
+  environment. Updated `lib/riskTrajectory.test.ts` by hand for the new `sex` parameter and the
+  new band-based expectations (removed the 3 tests for the deleted `classifyFitnessLevel`,
+  rewrote the 1 fitnessLevel test to check both sexes actually produce different bands), but this
+  needs a real test run to confirm — same caution as the Aug 15 UI/UX sprint in §10f.
+- The spec's optional "if time allows" ask — a dedicated Vitest suite for
+  `getVO2MaxRangeContext` covering below/at/above boundary cases — not done this round.
+- All other implementation-checklist items from the spec (mount point, token reuse, age/sex
+  threading, `classifyFitnessLevel` reconciliation) are done.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
