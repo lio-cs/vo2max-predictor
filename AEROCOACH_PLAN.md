@@ -555,8 +555,14 @@ deadline. Two things worth flagging before the list itself:
       that. Not close, not worth spending time on.
 
 **B. New feature requests raised in discussion**
-- [ ] SpO2 as a second metric (Digvijay) — not currently pulled at all; unverified whether
-      Fitbit even exposes this via the Google Health API; real scope, not a quick add
+- [x] SpO2 as a second metric (Digvijay) — **done Aug 16**: verified `daily-oxygen-saturation`
+      is a real Google Health API data type using the scope already granted, before building
+      anything. `lib/googleHealth.ts`'s `getLatestOxygenSaturation()`; classification
+      (normal/borderline/low, standard clinical thresholds) in `lib/riskTrajectory.ts`, kept
+      as supporting context only, same treatment as VO2max — never an input to the STOP-BANG
+      risk tier, since a daily wearable average is far coarser than the overnight
+      desaturation-event monitoring that actually indicates OSA-related hypoxemia clinically.
+      Best-effort fetch — absence or failure doesn't block the coaching flow.
 - [x] Personalized messaging by age/VO2max range (Digvijay) — **done Aug 16**: added
       deterministic `classifyFitnessLevel` (below/average/above_average, standard
       exercise-physiology norm, not a disease-risk claim — kept separate from the OSA risk
