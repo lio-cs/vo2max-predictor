@@ -7,7 +7,7 @@
   /* Formal navy / off-white / teal palette. "ink" and "paper" swap roles between
      light and dark so bg-ink/text-paper buttons invert correctly in both themes. */
   --paper: #f5f2ea;
-  --paper-alt: #e2e7e8;
+  --paper-alt: #e9e3d4;
   --ink: #101f2e;
   --ink-soft: #46566b;
   --ink-faint: #7c8798;

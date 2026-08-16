@@ -57,12 +57,12 @@ export default async function Home({
               </p>
             )}
 
-            <a
-              href="/api/auth/login"
+            <Link
+              href="/connect"
               className="relative mt-8 inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-medium text-paper transition-all hover:-translate-y-0.5 hover:bg-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-paper sm:w-auto sm:px-8"
             >
-              Connect Fitbit
-            </a>
+              Get started
+            </Link>
             <p className="relative mt-3 max-w-prose text-xs text-ink-faint">
               Takes under a minute. AeroCoach is a wellness and educational tool, not a
               diagnostic medical device. It doesn&apos;t replace a physician or a clinical sleep
