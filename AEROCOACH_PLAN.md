@@ -1313,6 +1313,24 @@ through the Devpost portal. Kept Lio's situation vague and respectful ("stepped 
 unexpectedly") rather than disclosing specifics — appropriate for a document reaching
 external organizers. Final word count ~860, within the 500–1000 requirement.
 
+## 10x. Submission sent by email (Aug 18)
+
+The actual submission went out by email to `testing@devpost.com` and `judging@hacker.fund`,
+built from `ea.pdf`'s finalized narrative — repo link, live demo video, the written narrative
+from §10w, honest "none to report" on revenue/users, and the four Production/Technical Proof
+screenshots (LangFuse trace table, the real Google OAuth consent screen, the `/connect`
+wearable-picker page, and Cloud Run's request-metrics dashboard), all pulled fresh right before
+sending rather than reused from the earlier draft.
+
+**Worth recording plainly, not glossed over:** this went out after Devpost's own submission
+portal had already closed — the email route (per §10w) is a direct consequence of that,
+compounded by the Cloud Run deploy issue and a teammate needing to step away. At the same time,
+the Gemini XPRIZE website itself was still displaying an open/active deadline at the time of
+sending, not reflecting Devpost's closure. Whether that's a genuine grace-period allowance, a
+sync lag between the two platforms, or something to actually raise with the organizers is not
+something to assume either way from here — noted as a real discrepancy observed at submission
+time, not resolved one way or the other.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
