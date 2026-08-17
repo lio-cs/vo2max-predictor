@@ -1282,6 +1282,16 @@ after the Devpost portal closed — see chat, submitting via direct email to org
 Not run locally (no Node/npm here) — verify with `npm run build`/`tsc --noEmit`/`eslint` before
 recording, same caveat as every other change today.
 
+## 10v. Privacy page spacing fix (Aug 18)
+
+`app/privacy/page.tsx`: the "Google Gemini API" line was the one tag boundary in the file not
+using the `{" "}` pattern the rest of the page already uses at every other adjacent-tag boundary
+— added it for consistency and to guarantee the space renders regardless of what the stale
+Cloud Run deploy is currently showing. Reviewed the rest of the page for redundant wording per
+Jyrah's ask; nothing else needed changing — the couple of places that restate a fact across two
+sections (e.g. "disconnect deletes your history" appearing briefly in both "Your rights" and
+"Data retention") are deliberate scanability, not bloat.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting

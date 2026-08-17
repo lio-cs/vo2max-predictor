@@ -30,7 +30,7 @@ export default function PrivacyPolicy() {
           <h2 className="font-display text-base font-medium text-ink">How it&apos;s used, and who sees it</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>
-              Sent to the <strong>Google Gemini API</strong> to generate the plain-English explanation and
+              Sent to the <strong>Google Gemini API</strong>{" "}to generate the plain-English explanation and
               chat responses. On Gemini&apos;s free tier, this data may be used by Google to improve its
               products, including model training, and may be reviewed by human raters — see{" "}
               <a
