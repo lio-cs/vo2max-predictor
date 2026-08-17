@@ -107,6 +107,9 @@ export default function ConnectPage() {
             AeroCoach works with the fitness data you already track. Pick where yours comes
             from — more devices are on the way.
           </p>
+          <p className="mt-2 max-w-prose text-xs text-ink-faint">
+            We only ever see your fitness data — never your name or email.
+          </p>
 
           <div className="mt-8 space-y-3">
             {WEARABLES.map((w) => (

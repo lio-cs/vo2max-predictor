@@ -996,6 +996,11 @@ decision only the team can make).
       actual bar, no architecture change needed (§10m)
 - [x] ACSM/Cooper Institute citation added next to the VO2max range block (§10m)
 - [x] Preview mockup resynced with both changes, republished to the same stable URL
+- [x] Same trust line added to `app/connect/page.tsx` (the wearable-picker) so the reassurance
+      appears at every funnel step — landing, connect, and result — not just two of the three.
+      Confirmed "Connect your Fitbit account" wording itself is accurate and doesn't need
+      changing: OAuth genuinely connects an account, the pseudonymity promise is about what
+      happens to the data *after* that, not that no account is ever touched.
 
 **Video (not started):**
 - [ ] Draft the ≤3-minute script/storyboard: problem → how it works (Fitbit VO2max → Gemini
