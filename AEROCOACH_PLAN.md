@@ -974,6 +974,52 @@ Not yet done as of this section: video script/recording, Devpost text descriptio
 whether Lionel's login/auth work has moved (checked `git log origin/master` — still at `4e4a7ad`,
 nothing new pushed since the Aug 16 PII-redaction commit).
 
+## 10n. Aug 17 — submission-day to-do list (deadline 1:00pm PT)
+
+Jyrah has a separate meeting ~3 hours out and Lionel is heads-down elsewhere, so this is the
+scoped list for what's left before submission, in priority order. Checked off = done as of this
+section; everything else needs a human in the loop (recording a voice, clicking "submit," or a
+decision only the team can make).
+
+**Blocked on Lionel (pinged async, not yet confirmed):**
+- [ ] Either (a) 10 min of temp access so Jyrah can screen-record the real logged-in flow, or
+      (b) Lionel records that one segment himself and sends the clip — needed for the video's
+      "functioning on target device" proof. Fallback if this doesn't land in time: record the
+      Artifact preview instead and narrate honestly that it's the UI prototype backed by the real
+      Fitbit/Gemini pipeline (see §10m).
+- [ ] Confirm whether his login/auth work has actually moved since `e2a9970` (Aug 16) — repo
+      shows nothing new pushed as of this section.
+
+**UI/UX — done this session:**
+- [x] Pseudonymity confirmation surfaced in-product (landing page + result card), not just the
+      privacy policy — per team confirmation that pseudonymous (hashed, not name-linked) is the
+      actual bar, no architecture change needed (§10m)
+- [x] ACSM/Cooper Institute citation added next to the VO2max range block (§10m)
+- [x] Preview mockup resynced with both changes, republished to the same stable URL
+
+**Video (not started):**
+- [ ] Draft the ≤3-minute script/storyboard: problem → how it works (Fitbit VO2max → Gemini
+      coaching) → AI-native proof (visible Gemini-generated text, maps directly to the AI-Native
+      Operations judging criterion) → category-impact/roadmap close. Manus is fine for drafting
+      narration copy; the footage itself has to be real per the Devpost rules (§10m).
+- [ ] Record screen capture + AI or human voiceover reading that script
+- [ ] Upload to YouTube/Vimeo/Youku as a **public** link (required by the rules)
+
+**Devpost submission text (not started):**
+- [ ] Text description tying features to the Education & Human Potential category
+- [ ] Revenue/user-evidence fields answered honestly as early-stage/pre-revenue — not
+      padded, per team guidance that Business Viability isn't a winnable criterion for a
+      week-old build (§10m)
+- [ ] Public code repo link / access already satisfied (`lio-cs/vo2max-predictor`, Jyrah has
+      collaborator access)
+
+**Before Jyrah's meeting:**
+- [ ] Leave Lionel a clear async handoff note covering whatever's still open from this list
+
+**Explicitly not doing:** faking revenue/user metrics, generating fake demo footage, or any
+change to the trend-history/cross-visit-linking architecture (would need team sign-off first,
+see §10m).
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
