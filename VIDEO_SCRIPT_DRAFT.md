@@ -5,8 +5,9 @@
 category-impact/roadmap close, ≤3 minutes, honest (no fabricated users/revenue/footage per the
 Devpost rules).
 
-~219 words. At a natural narration pace (120–135 wpm, accounting for pauses between beats)
-that's roughly **1:38–1:50** — comfortably under the 2-minute target.
+~239 words. At a natural narration pace (120–135 wpm, accounting for pauses between beats)
+that's roughly **1:46–1:59** — under the 2-minute target, with less margin than before now
+that a progress-tracking line was added, so this is the one to trim first if a take runs long.
 
 **Changed from the previous draft:** trimmed for length; the AI-native beat now leads with what
 Gemini does (translation, not judgment) rather than dwelling on it reading data, and pivots
@@ -32,7 +33,7 @@ The gold-standard test is an overnight stay in a sleep lab — expensive, inconv
 
 AeroCoach is that reason. It reads the fitness data you're already generating — your VO2max, from a Fitbit or an Apple Watch — walks you through STOP-BANG, a validated eight-question screening tool, and turns the result into a plain-English read on your risk.
 
-Here's what that looks like. Connect your wearable — no new hardware, no new habit. AeroCoach estimates your VO2max from your resting heart rate and age, asks you eight yes-or-no questions, and writes this explanation live, in real time — not a canned response.
+Here's what that looks like. Connect your wearable — no new hardware, no new habit. AeroCoach estimates your VO2max from your resting heart rate and age, asks you eight yes-or-no questions, and writes this explanation live, in real time — not a canned response. And every time you come back, AeroCoach tracks your VO2max trend over time, so you can watch your progress build.
 
 Gemini's job here is deliberately narrow — it never decides your risk level, that's a validated clinical rule, computed the same way every time. Gemini only turns an already-decided result into plain language. And none of it is ever linked back to you as an individual — no name, no email, just the numbers, kept separate from your identity the whole way through.
 

@@ -61,9 +61,10 @@ const WHY_THIS_MATTERS =
 
 interface StopBangFormProps {
   age: number;
+  provider: "google" | "apple";
 }
 
-export function StopBangForm({ age }: StopBangFormProps) {
+export function StopBangForm({ age, provider }: StopBangFormProps) {
   const [answers, setAnswers] = useState<StopBangAnswers>(DEFAULT_ANSWERS);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -210,7 +211,7 @@ export function StopBangForm({ age }: StopBangFormProps) {
         <div>
           <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">Your trend</p>
           <div className="mt-1 rounded-lg bg-paper p-3">
-            <TrendChart history={history} milestone={milestone} />
+            <TrendChart history={history} milestone={milestone} provider={provider} />
           </div>
         </div>
 

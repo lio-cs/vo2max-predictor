@@ -1156,6 +1156,36 @@ design:
 Not run locally (no Node/npm here) — verify with `npm run build`/`tsc --noEmit`/`eslint` before
 the demo, same caveat as every other UI change today.
 
+## 10q. True calendar-day trend chart for the Google/Fitbit path (Aug 17)
+
+**How long until the trend chart actually shows something:** checked the real mechanics before
+answering — `lib/coachLog.ts` keys each Firestore entry by calendar date (`.doc(entry.date)`,
+merge-set), so re-running the flow twice in one day overwrites, never appends. That means the
+data is already inherently one-reading-per-24-hours for both providers. `TrendChart` needs 2
+distinct days to render at all; `assessFitnessContext`'s trend classification
+(improving/stable/declining vs. `insufficient_data`) needs 3 *prior* days plus today, so 4 days
+of use minimum before it stops saying "insufficient data." A milestone needs 2 days for a new
+high, or 3+ consecutive rising days for a streak.
+
+**The actual gap, once that was clear:** `TrendChart` positioned bars by array index, not by
+real elapsed time — a user who connects, skips two weeks, then comes back would see 2 bars
+sitting right next to each other with no visual sign 14 days separated them. Fixed for the
+**Google/Fitbit path only**, per explicit instruction to leave Apple untouched: `TrendChart` now
+takes a `provider` prop (threaded down from `page.tsx` through `StopBangForm`); when
+`provider === "google"`, `fillDailyGaps()` expands the history into one slot per actual calendar
+day between the oldest and newest reading, rendering a dashed empty slot for any skipped day
+instead of silently compressing the gap away. Bounded to a 30-day span (falls back to the old
+sequential rendering beyond that) so a genuinely sparse history doesn't render dozens of
+near-invisible slivers. Apple's rendering path is the exact same code as before this change —
+its readings come from a single point-in-time export rather than a continuously synced device,
+so "skipped a day" doesn't carry the same meaning there, which is also why it wasn't touched.
+
+Also added a line to the video script noting the trend-tracking feature exists (§ the script
+file itself).
+
+Verified: 137 tests passing (8 new, covering `daysBetween`/`fillDailyGaps` including the
+multi-gap and span-boundary cases), lint clean, build clean.
+
 ## 10r. Privacy policy finalized; disconnect now actually deletes stored history (Aug 17, per Jyrah)
 
 Jyrah asked to make the privacy policy "the final thing" and resolve the two gaps §10p had
