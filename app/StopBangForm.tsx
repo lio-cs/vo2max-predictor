@@ -124,6 +124,7 @@ export function StopBangForm({ age }: StopBangFormProps) {
           </div>
         ) : (
           <div className="space-y-2">
+            <p className="text-xs text-ink-faint">Check a box only if the answer is yes — if no, leave it unchecked.</p>
             {QUESTIONS.map((q) => (
               <label key={q.key} className="flex items-start gap-2 text-sm text-ink-soft">
                 <input

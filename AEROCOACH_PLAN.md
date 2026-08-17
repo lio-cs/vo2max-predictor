@@ -1133,6 +1133,26 @@ rest of this policy and `DISCLAIMER_DRAFT.md` are framed.
 
 Verified: lint clean, build clean.
 
+## 10q. Two small clarity fixes ahead of recording (Aug 17, per Jyrah)
+
+Reviewing the live deployment (`vo2max-predictor-git-89170208601.europe-west1.run.app`) ahead of
+the demo recording surfaced two spots where the copy itself was a source of friction, not the
+design:
+
+- **Apple Health import instructions:** the "Health app → profile picture → Export All Health
+  Data" hint under the file picker was a single dense arrow-chain, easy to misread as one
+  location instead of three sequential taps. Rewritten as three numbered steps
+  (`app/AppleHealthImportForm.tsx`) — same information, laid out as a sequence instead of a
+  breadcrumb, since it's actually describing a multi-step action a first-time user has to
+  perform on their own phone with the export flow.
+- **STOP-BANG questions:** the 8-question checklist gave no explicit instruction on what an
+  unchecked box means, which risks someone leaving a "yes" answer blank by uncertainty rather
+  than intent. Added one line above the question list (`app/StopBangForm.tsx`): "Check a box
+  only if the answer is yes — if no, leave it unchecked."
+
+Not run locally (no Node/npm here) — verify with `npm run build`/`tsc --noEmit`/`eslint` before
+the demo, same caveat as every other UI change today.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting

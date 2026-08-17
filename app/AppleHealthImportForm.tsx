@@ -64,7 +64,11 @@ export function AppleHealthImportForm() {
           />
         </svg>
         <span className="text-sm font-medium text-ink">Choose your export.zip</span>
-        <span className="text-xs text-ink-faint">Health app → profile picture → Export All Health Data</span>
+        <div className="space-y-0.5 text-xs leading-relaxed text-ink-faint">
+          <p>1. Open the Health app</p>
+          <p>2. Tap your profile picture, top right</p>
+          <p>3. Tap Export All Health Data</p>
+        </div>
         <input
           type="file"
           accept=".zip,application/zip"
