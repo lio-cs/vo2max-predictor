@@ -49,17 +49,23 @@ AeroCoach — built by AeroGlyphics, powered by Gemini. Eighty percent of a bill
 | Hook | "An estimated one billion..." | 0:00–0:10 | Static title card or the landing page hero, no interaction yet |
 | Problem | "The gold-standard test..." | 0:10–0:22 | Landing page, slow scroll/hold |
 | Intro | "AeroCoach is that reason..." | 0:22–0:40 | `/connect` wearable-picker page |
-| Live demo | "Here's what that looks like..." | 0:40–1:05 | **Real, live** click-through: connect → STOP-BANG questions → result panel appearing with Gemini's coaching text visibly generating |
-| AI-native + trust | "Gemini's job here is..." | 1:05–1:35 | Hold on the coaching result text on screen while this plays |
-| Close + tagline | "AeroCoach — built by AeroGlyphics..." | 1:35–1:50 | Logo card, ends |
+| Live demo | "Here's what that looks like..." | 0:40–1:10 | **Real, live** click-through: connect → STOP-BANG questions → result panel appearing, then a quick beat on the trend chart for the "tracks your VO2max trend" line |
+| AI-native + trust | "Gemini's job here is..." | 1:10–1:40 | Hold on the coaching result text on screen while this plays |
+| Close + tagline | "AeroCoach — built by AeroGlyphics..." | 1:40–1:55 | Logo card, ends |
+
+*(Timestamps recalculated from the word counts per beat — the "Live demo" paragraph grew by
+~20 words when the trend-tracking sentence was added, but the timing column in the previous
+draft wasn't updated to match, which would have cut away from the demo ~4-5s before the
+narration actually got there.)*
 
 **Only use real, live footage for the demo beat** — per the Devpost rules already flagged in
-§10m, no mockups presented as if they're the working product. Record the **Fitbit path**, since
-that's the one that's actually been clicked through live by a human this session. The Apple
-Health import (§10o) is verified end-to-end via automated tests and one real 51MB-export parse,
-but nobody has clicked through the actual browser file-picker yet — don't put it in the video
-until someone has, even though the script's one mention of "a Fitbit or an Apple Watch" is
-accurate either way (both are genuinely live in the deployed app).
+§10m, no mockups presented as if they're the working product. **Update:** the earlier caution
+against recording the Apple Health path no longer applies — Jyrah clicked through the real
+import end-to-end on Aug 17 and confirmed it works, so both paths are now human-verified live,
+not just automated-test-verified. Either is safe to record; a good structure given the ≤2-minute
+runtime is to show the `/connect` wearable-picker with both real options visible (a few seconds,
+proves multi-wearable support), then do the full click-through-to-result demo on one path only
+(Fitbit is the simpler one to film cleanly) rather than doubling the demo beat's length.
 
 ---
 
@@ -70,10 +76,11 @@ voice, generate, download the MP3. No GCP setup, no API keys, done in a couple o
 
 - Free tier includes roughly 10,000 characters/month; this script is around 1,200 characters, so
   it fits comfortably with plenty of room to regenerate takes.
-- Voice pick: choose something calm and even — a "Narration" or "Documentary" preset, not an
-  energetic/hype voice. This is health-adjacent content; the same "calm, not alarming" tone
-  already baked into the product's own coaching copy (see `lib/geminiCoach.ts`'s system prompt)
-  should carry into the video.
+- Voice pick, per Jyrah's Aug 17 direction: **confident and energetic — Apple/Google product-ad
+  register, not a flat documentary narrator.** This is a deliberate change from this draft's
+  original guidance (calm/even, matching the "calm, not alarming" tone baked into the product's
+  own coaching copy in `lib/geminiCoach.ts`) — worth knowing the two are in tension for
+  health-adjacent content, but the call has been made in favor of the more energetic register.
 - Default settings are fine; if there's time, nudge "Stability" up slightly for a steadier,
   less performative read.
 

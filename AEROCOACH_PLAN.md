@@ -1156,7 +1156,10 @@ design:
 Not run locally (no Node/npm here) — verify with `npm run build`/`tsc --noEmit`/`eslint` before
 the demo, same caveat as every other UI change today.
 
-## 10q. True calendar-day trend chart for the Google/Fitbit path (Aug 17)
+## 10s. True calendar-day trend chart for the Google/Fitbit path (Aug 17)
+
+*(Relabeled from §10q to §10s to resolve a numbering collision — §10q was already used above for
+"Two small clarity fixes ahead of recording." Content unchanged, label only.)*
 
 **How long until the trend chart actually shows something:** checked the real mechanics before
 answering — `lib/coachLog.ts` keys each Firestore entry by calendar date (`.doc(entry.date)`,
@@ -1222,6 +1225,42 @@ it would have been a worse call while those gaps were still just disclaimed rath
 Not run locally (no Node/npm here) — `db.recursiveDelete()` in particular is worth a real test
 against Firestore before the demo, not just a read-through; verify with `npm run build`/
 `tsc --noEmit`/`eslint` too, same caveat as every other change today.
+
+## 10t. Script review after Lio's trend-tracking update; voice-tone change (Aug 17, per Jyrah)
+
+Reviewed `VIDEO_SCRIPT_DRAFT.md` after Lio added the trend-tracking sentence (§10s) to the "Live
+demo" narration beat. Two real issues found and fixed, not just a read-through:
+
+- **Storyboard timing had gone stale.** The added sentence (~20 words) grew the "Live demo" beat
+  but the storyboard table's timestamps weren't adjusted — it still said that beat ended at 1:05,
+  which would have cut the recording away from the demo ~4-5s before the narration actually
+  finished describing it. Recalculated per-beat timing from actual word counts at the doc's own
+  120–135 wpm target and shifted the three affected beats (Live demo now 0:40–1:10, AI-native +
+  trust 1:10–1:40, Close + tagline 1:40–1:55) — lands inside the doc's own updated "1:46–1:59"
+  total estimate.
+- **The Apple Health recording caution was stale.** The storyboard said not to film the Apple
+  Health import because nobody had clicked through the real file-picker yet — Jyrah did that
+  live today and confirmed it works, so that blocker is cleared. Updated the note; recommended
+  structure given the ≤2-minute runtime: show both options on `/connect` (proves multi-wearable
+  support in a few seconds) but do the full click-through-to-result demo on one path only
+  (Fitbit, simpler to film cleanly) rather than doubling the demo beat.
+- **Also caught while reviewing (not a script bug, a filming heads-up):** the script's "writes
+  this explanation live, in real time" line is accurate but the old storyboard direction ("result
+  panel appearing with Gemini's coaching text visibly generating") implied visible token-by-token
+  streaming. Checked `lib/geminiCoach.ts` — it calls Gemini's non-streaming `generateContent`
+  endpoint, so the real UI shows a loading state, then the complete answer appears at once, not
+  progressively. Narration wording still holds ("live" = a real uncached call, not scripted); the
+  storyboard direction was reworded so whoever's filming doesn't expect streaming that doesn't
+  exist, or try to fake it.
+
+**Voice-tone direction changed, explicit and deliberate — flagging the tradeoff, not blocking
+on it:** Jyrah wants the AI voiceover to read like an Apple/Google product ad — confident,
+energetic — rather than this draft's original "calm, even, documentary-style" guidance. Updated
+the "Recommended AI voice tool" section to match. Worth knowing this is in real tension with the
+"calm, not alarming" tone deliberately baked into the product's own coaching copy
+(`lib/geminiCoach.ts`'s system prompt) — noted in the file so it's a documented decision if this
+comes up again, not an unnoticed drift. The call has been made in favor of the more energetic
+register; not re-litigated here.
 
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
