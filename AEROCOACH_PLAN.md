@@ -575,8 +575,8 @@ deadline. Two things worth flagging before the list itself:
       expected.
 - [ ] Voice-to-text via Whisper (Eangelica) — new third-party integration, real scope, not
       feasible in the remaining time
-- [ ] Apple HealthKit/Apple Watch support (Eangelica) — currently Fitbit/Google Health only;
-      large scope, realistically roadmap-only for the narrative rather than built
+- [x] Apple HealthKit/Apple Watch support (Eangelica) — built Aug 17 via client-side Health
+      app export import, not HealthKit live sync; see §10o for the real scope that shipped
 - [ ] Lovable/Manus tooling (Eangelica) — unclear concrete action; alternative app builders,
       not obviously applicable on top of the existing tested Next.js codebase
 - [ ] "Digital nurse" / hospital-chain interface framing (Digvijay/Eangelica) — pitch
@@ -948,7 +948,13 @@ Two things that reshape the last-day plan:
   not chasing it; those submission fields get answered honestly rather than padded. Effort instead
   goes to the two winnable criteria: **AI-Native Operations** (Gemini live in the coaching/
   follow-up flow — already true, just needs to be visible in the video) and **Category Impact**
-  (Education & Human Potential fit — OSA risk awareness).
+  (registered under Category 5: Professional Services per the Aug 9 meeting — see §1 — OSA risk
+  awareness as a professional-services-adjacent screening tool, not a clinical diagnosis).
+
+**Correction to this section:** the paragraph above originally said "Education & Human
+Potential," written without checking §1 first. The team registered under **Category 5:
+Professional Services** back on Aug 9 — confirmed by `VIDEO_SCRIPT_DRAFT.md`, which Lionel wrote
+independently and got right. §10n's checklist item is corrected to match.
 
 **Tracking/privacy check, prompted by a manager note that there should be "no way to track which
 VO2max belongs to who":** re-read `getUserKey()` from §10g's data-separation work — trend history
@@ -1014,9 +1020,19 @@ decision only the team can make).
       the same file (ElevenLabs free tier, primary; Google Cloud TTS as a slower Google-stack-native
       alternative)
 - [ ] Upload to YouTube/Vimeo/Youku as a **public** link (required by the rules)
+- [x] Script reviewed against the actual repo state (not just read at face value): the
+      "Fitbit or Apple Watch" and "real Fitbit and Apple Health integration" lines are both
+      accurate as of `a2ee9fb`/§10o, the Category 5: Professional Services line matches §1, and
+      the "no fabricated users/revenue" line matches team guidance from §10m. One pre-recording
+      action item the script's own storyboard already flags and this confirms: **someone needs
+      to click through the real Apple Health import file-picker once in a live browser before
+      it's safe to include that path in the recording** — it's currently verified by automated
+      tests plus one scripted end-to-end parse, not an actual UI click-through.
 
 **Devpost submission text (not started):**
-- [ ] Text description tying features to the Education & Human Potential category
+- [ ] Text description tying features to **Category 5: Professional Services** (corrected —
+      see §1 and the correction note in §10m; was wrongly written as "Education & Human
+      Potential" earlier today)
 - [ ] Revenue/user-evidence fields answered honestly as early-stage/pre-revenue — not
       padded, per team guidance that Business Viability isn't a winnable criterion for a
       week-old build (§10m)
