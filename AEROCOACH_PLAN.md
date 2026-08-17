@@ -1292,6 +1292,27 @@ Jyrah's ask; nothing else needed changing — the couple of places that restate 
 sections (e.g. "disconnect deletes your history" appearing briefly in both "Your rights" and
 "Data retention") are deliberate scanability, not bloat.
 
+## 10w. Updated NARRATIVE_DRAFT.md for the real, final submission (Aug 18)
+
+`NARRATIVE_DRAFT.md` existed already from Aug 15 — written to the actual XPRIZE narrative format
+(AI usage, human/AI split, jobs/economic opportunity, build story, 500–1000 words) but describing
+the project at its Aug 15 midpoint, before the Apple Health build, the real privacy/deletion
+mechanism, and everything from today. Updated in place rather than rewritten from scratch — the
+Aug 15 version's honest framing and the already-correct prevalence stats (83.7M US adults, 80%
+undiagnosed — independently reverified against AASM's 2024 figures tonight) were kept.
+
+Real changes: named Lio and Jyrah specifically with their actual roles instead of generic
+"technical lead"/"market lead"; swapped the AI-usage examples for what actually happened this
+week (the Apple Health streaming bug, the Firestore multi-user collision bug, catching a
+same-day category error by checking notes instead of assuming); kept the jobs/economic-
+opportunity section's honest "we're not overstating this" stance, tightened to the real
+mechanism (referral toward real clinical care, not headcount); and rewrote the build-story
+closer to include what's actually true tonight — the Cloud Run deploy issue, a teammate having
+to step away unexpectedly, and that this is why the narrative is going out by email instead of
+through the Devpost portal. Kept Lio's situation vague and respectful ("stepped away
+unexpectedly") rather than disclosing specifics — appropriate for a document reaching
+external organizers. Final word count ~860, within the 500–1000 requirement.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
