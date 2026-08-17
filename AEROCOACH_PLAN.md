@@ -1115,6 +1115,24 @@ correctly).
 real `/connect` → Apple Health import → coaching flow once, same as the outstanding Docker
 build-on-real-machine item in §6.
 
+## 10p. Privacy policy pass (Aug 17)
+
+`app/privacy/page.tsx`'s "Cookies" section had gone stale — it still said "two cookies" from
+before §10o added a third (`apple_health_session`). Rewrote it to describe cookies by what they
+do (one session cookie either way, plus a short-lived CSRF cookie only during Fitbit login)
+rather than a hardcoded count, so it won't silently go stale again the next time a cookie is
+added or removed.
+
+Also resolved the placeholder contact email, per explicit direction: **removed the contact
+mechanism entirely** rather than filling in a guessed or unmonitored address — "Your rights" now
+states the GDPR rights that exist (access, deletion beyond disconnect) and honestly flags that
+there's no working request channel for them yet, instead of pointing at an email nobody's
+checking. Data retention stays an honestly-flagged known gap, not built today — explicit team
+call to keep it that way rather than rush infra work on submission day, consistent with how the
+rest of this policy and `DISCLAIMER_DRAFT.md` are framed.
+
+Verified: lint clean, build clean.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting

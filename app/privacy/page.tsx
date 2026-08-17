@@ -93,21 +93,23 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="font-display text-base font-medium text-ink">Cookies</h2>
           <p className="mt-2">
-            We set two cookies, both strictly necessary for the app to function (keeping you signed in, and
-            protecting the login flow from cross-site request forgery). Neither is used for tracking,
-            advertising, or analytics, so no cookie consent banner is shown for them — but we&apos;re
-            disclosing them here for transparency regardless.
+            We set up to two cookies at a time, both strictly necessary for the app to function — which ones
+            depend on how you connect. Everyone gets one session cookie (either for the Fitbit path or the
+            Apple Health path, never both). If you use Fitbit, a second, short-lived cookie protects the login
+            handshake from cross-site request forgery and expires within minutes regardless of whether login
+            succeeds. None of these are used for tracking, advertising, or analytics, so no cookie consent
+            banner is shown for them — but we&apos;re disclosing them here for transparency regardless.
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-base font-medium text-ink">Your rights</h2>
           <p className="mt-2">
-            You can disconnect your account at any time (see the &quot;Disconnect&quot; link in the app),
-            which clears your session immediately. To request deletion of any logged history, or to ask what
-            data we hold, contact us at{" "}
-            <span className="rounded bg-paper-alt px-1 font-mono text-xs">[team contact email — placeholder]</span>.
-            {" "}<em>(This needs a real inbox before this policy is actually published — placeholder for now.)</em>
+            You can disconnect your account at any time (see the &quot;Disconnect&quot; link in the app) —
+            this clears your session immediately and stops any further processing. Under GDPR you&apos;re also
+            entitled to request access to, or deletion of, any logged history beyond that.{" "}
+            <em>(Flagging honestly: there isn&apos;t a working request channel for that set up yet — this
+            needs a real, monitored point of contact before this policy is actually published.)</em>
           </p>
         </section>
 
