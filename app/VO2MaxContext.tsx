@@ -49,6 +49,10 @@ export function VO2MaxContext({ vo2max, age, sex, defaultOpen = false }: VO2MaxC
           This is fitness context, not part of your sleep-apnea result. AeroCoach is an
           advisor, not a doctor.
         </p>
+        <p className="text-xs text-ink/60">
+          Ranges from the ACSM Guidelines for Exercise Testing and Prescription (11th ed.),
+          Cooper Institute normative data.
+        </p>
       </div>
     </details>
   );

@@ -68,6 +68,13 @@ export default async function Home({
               diagnostic medical device. It doesn&apos;t replace a physician or a clinical sleep
               study — it helps you know when it&apos;s time to ask for one.
             </p>
+            <p className="relative mt-2 max-w-prose text-xs text-ink-faint">
+              Your results are kept pseudonymous — we never see your name, email, or account
+              identity.{" "}
+              <Link href="/privacy" className="underline">
+                How this works
+              </Link>
+            </p>
           </div>
         ) : (
           <div className="mt-10">
@@ -185,6 +192,7 @@ async function Result() {
           </span>
         </div>
         <p className="text-xs text-ink-faint">mL/kg/min</p>
+        <p className="mt-2 text-[11px] text-ink-faint/80">Linked to a pseudonymous ID, not your name</p>
       </div>
 
       <dl className="grid grid-cols-2 gap-4 text-sm">

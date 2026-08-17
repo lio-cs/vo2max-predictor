@@ -933,6 +933,47 @@ with Eangelica whether the mock P&L slide is still needed alongside her real bus
 today: whether an "Apple Watch — Coming soon" card is honest roadmap signaling or overclaim for
 a hackathon demo audience is flagged in §10j for the team to weigh in on, not decided here.
 
+## 10m. Submission-prep pass against the actual Devpost rules (Aug 17, morning)
+
+Read the real "Build with Gemini XPRIZE" rules (xprize.devpost.com/rules) instead of assuming.
+Two things that reshape the last-day plan:
+
+- Video must show the project **functioning on its target device** — under 3 minutes ("should
+  be less than three (3) minutes," judges not required to watch past that). An AI-generated fake
+  demo would misrepresent this; an AI voiceover (script drafted with help from Manus) narrating a
+  *real* screen recording is fine — the footage is what has to be genuine, not the narration
+  style.
+- Business Viability (real revenue/users over a 90-day period) is 1 of 3 equally-weighted
+  judging criteria and not honestly achievable for a project built in a week — per team guidance,
+  not chasing it; those submission fields get answered honestly rather than padded. Effort instead
+  goes to the two winnable criteria: **AI-Native Operations** (Gemini live in the coaching/
+  follow-up flow — already true, just needs to be visible in the video) and **Category Impact**
+  (Education & Human Potential fit — OSA risk awareness).
+
+**Tracking/privacy check, prompted by a manager note that there should be "no way to track which
+VO2max belongs to who":** re-read `getUserKey()` from §10g's data-separation work — trend history
+is linked via a one-way SHA-256 hash of the user's Fitbit OAuth refresh token, so it's
+**pseudonymous, not fully untrackable**: no name/email reaches anything, but the same hash always
+maps back to the same person, so cross-visit history is technically re-identifiable to "one
+specific recurring Fitbit account" by anyone with Firestore access. Confirmed with Jyrah that
+pseudonymous is the actual bar the manager meant (not zero linkage) — so no architecture change,
+just made the claim visible in the product itself instead of only in the privacy policy:
+- Landing page: pseudonymity line under the CTA, linking to `/privacy`
+- Result view: "Linked to a pseudonymous ID, not your name" under the VO2max card
+If a future conversation revisits this and the bar turns out to be stricter (zero linkage, no
+persisted cross-visit history), that's a real feature change — dropping the trend/milestone
+feature or reworking it to be session-only — not a copy fix, and shouldn't be done without the
+team weighing in first.
+
+**Also added:** an ACSM Guidelines for Exercise Testing and Prescription (11th ed.)/Cooper
+Institute citation line in `VO2MaxContext.tsx`, next to the age/sex range copy from §10h — cheap,
+real rigor signal for the Category Impact criterion, not a new claim (the ranges were already
+sourced from ACSM, just wasn't credited in the UI itself).
+
+Not yet done as of this section: video script/recording, Devpost text description, confirming
+whether Lionel's login/auth work has moved (checked `git log origin/master` — still at `4e4a7ad`,
+nothing new pushed since the Aug 16 PII-redaction commit).
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting
