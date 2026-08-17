@@ -27,7 +27,7 @@ Here's what that looks like. Connect your wearable — no new hardware, no new h
 
 That matters, because Gemini's job here is deliberately narrow. It never decides your risk level — that's a validated clinical rule, computed in code, every time, the same way. Gemini's only job is translation: turning an already-decided result into language a non-clinician can actually understand, without it ever sounding like a diagnosis. That's the AI-native part of this build — not a chatbot bolted onto a static app, but a model doing real, live, load-bearing work, with the same guardrails and observability you'd want in anything actually shipping to real people.
 
-We built this as AeroGlyphics, for the Gemini XPRIZE, in Professional Services — as a practice sprint, not a polished pitch. No fabricated users. No fabricated revenue. What's real is a live product, a real Fitbit and Apple Health integration, and a deliberate decision to keep AI out of the one place it shouldn't be making the call: your health risk.
+We built this as AeroGlyphics, for the Gemini XPRIZE, in Education and Human Potential — as a practice sprint, not a polished pitch. No fabricated users. No fabricated revenue. What's real is a live product, a real Fitbit and Apple Health integration, and a deliberate decision to keep AI out of the one place it shouldn't be making the call: your health risk.
 
 Eighty percent of a billion people don't know they have this. AeroCoach is one plain-English nudge toward finding out.
 ```

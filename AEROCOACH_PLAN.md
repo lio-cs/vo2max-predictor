@@ -28,6 +28,12 @@ the tech properly," not "win."
   working end-to-end MVP first
 - Project budget capped at **$0** — free tiers only
 
+**Update, Aug 17 (submission day):** the team is now submitting under **Education & Human
+Potential** instead — a deliberate switch from the Aug 9 Professional Services registration, per
+Jyrah. `VIDEO_SCRIPT_DRAFT.md` and the §10n/§10m checklist references have been updated to match.
+If anything else in this doc still says "Professional Services" as the *current* category
+(rather than describing the Aug 9 history above), treat this line as the current source of truth.
+
 ## 2. What "AeroCoach" actually is
 
 **Per the team's Aug 9 meeting:** an AI chat coach that collects VO2max and sleep data from
@@ -948,13 +954,13 @@ Two things that reshape the last-day plan:
   not chasing it; those submission fields get answered honestly rather than padded. Effort instead
   goes to the two winnable criteria: **AI-Native Operations** (Gemini live in the coaching/
   follow-up flow — already true, just needs to be visible in the video) and **Category Impact**
-  (registered under Category 5: Professional Services per the Aug 9 meeting — see §1 — OSA risk
-  awareness as a professional-services-adjacent screening tool, not a clinical diagnosis).
+  (Education & Human Potential — OSA risk awareness, per the Aug 17 switch documented in §1).
 
-**Correction to this section:** the paragraph above originally said "Education & Human
-Potential," written without checking §1 first. The team registered under **Category 5:
-Professional Services** back on Aug 9 — confirmed by `VIDEO_SCRIPT_DRAFT.md`, which Lionel wrote
-independently and got right. §10n's checklist item is corrected to match.
+**Correction history on this line, for anyone reading this later:** written as "Education &
+Human Potential" originally (without checking §1's Aug 9 decision first) → corrected to
+"Category 5: Professional Services" once §1 was checked → corrected back to "Education & Human
+Potential" per Jyrah's explicit Aug 17 decision to switch categories (see §1's "Update, Aug 17"
+note). Current and correct as of this line: **Education & Human Potential.**
 
 **Tracking/privacy check, prompted by a manager note that there should be "no way to track which
 VO2max belongs to who":** re-read `getUserKey()` from §10g's data-separation work — trend history
@@ -1022,17 +1028,20 @@ decision only the team can make).
 - [ ] Upload to YouTube/Vimeo/Youku as a **public** link (required by the rules)
 - [x] Script reviewed against the actual repo state (not just read at face value): the
       "Fitbit or Apple Watch" and "real Fitbit and Apple Health integration" lines are both
-      accurate as of `a2ee9fb`/§10o, the Category 5: Professional Services line matches §1, and
-      the "no fabricated users/revenue" line matches team guidance from §10m. One pre-recording
-      action item the script's own storyboard already flags and this confirms: **someone needs
-      to click through the real Apple Health import file-picker once in a live browser before
-      it's safe to include that path in the recording** — it's currently verified by automated
-      tests plus one scripted end-to-end parse, not an actual UI click-through.
+      accurate as of `a2ee9fb`/§10o, and the "no fabricated users/revenue" line matches team
+      guidance from §10m. One pre-recording action item the script's own storyboard already
+      flags and this confirms: **someone needs to click through the real Apple Health import
+      file-picker once in a live browser before it's safe to include that path in the
+      recording** — it's currently verified by automated tests plus one scripted end-to-end
+      parse, not an actual UI click-through.
+- [x] Category line in `VIDEO_SCRIPT_DRAFT.md` updated to **Education & Human Potential** per
+      Jyrah's Aug 17 decision (see §1's "Update, Aug 17" note) — was "Professional Services"
+      in Lionel's original draft, now corrected to match the actual submission category.
 
 **Devpost submission text (not started):**
-- [ ] Text description tying features to **Category 5: Professional Services** (corrected —
-      see §1 and the correction note in §10m; was wrongly written as "Education & Human
-      Potential" earlier today)
+- [ ] Text description tying features to **Education & Human Potential** (current, per §1's
+      Aug 17 update — this line has flip-flopped twice today in this doc alone, so double-check
+      §1 directly rather than trusting any other single mention of the category)
 - [ ] Revenue/user-evidence fields answered honestly as early-stage/pre-revenue — not
       padded, per team guidance that Business Viability isn't a winnable criterion for a
       week-old build (§10m)

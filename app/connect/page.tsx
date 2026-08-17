@@ -92,19 +92,39 @@ function WearableCard({ name, description, href }: Wearable) {
 
 // Same outer chrome as WearableCard's "available" state, but Apple Watch needs an inline file
 // picker rather than a single link — so it's its own block instead of going through the
-// href-driven WEARABLES list above.
+// href-driven WEARABLES list above. The file picker stays collapsed until clicked (native
+// <details>, not hover — hover has no equivalent on touch, and the rest of the app already uses
+// this exact click-to-expand pattern for "Why this matters"/VO2MaxContext) so the picker doesn't
+// visually anchor the list before someone's actually chosen this card.
 function AppleWatchCard() {
   return (
-    <div className="space-y-3 rounded-xl border border-hairline bg-paper-alt p-4">
-      <div className="flex items-center gap-4">
+    <details className="group space-y-3 rounded-xl border border-hairline bg-paper-alt p-4">
+      <summary className="flex cursor-pointer list-none items-center gap-4 [&::-webkit-details-marker]:hidden">
         <WatchIcon className="h-6 w-6 shrink-0 text-accent" />
         <div className="flex-1">
           <p className="text-sm font-medium text-ink">Apple Watch</p>
           <p className="mt-0.5 text-xs text-ink-faint">Import a Health app export to get started.</p>
         </div>
+        <ChevronIcon className="h-4 w-4 shrink-0 text-accent transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="pt-1">
+        <AppleHealthImportForm />
       </div>
-      <AppleHealthImportForm />
-    </div>
+    </details>
+  );
+}
+
+function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M4 6l4 4 4-4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
