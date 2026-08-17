@@ -2,9 +2,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="mx-auto max-w-2xl px-6 py-16 sm:px-10">
       <h1 className="font-display text-2xl font-medium text-ink">Privacy Policy</h1>
-      <p className="mt-2 text-xs text-ink-faint">
-        Practice build — draft for team/legal review, not a final published policy. Last updated Aug 17, 2026.
-      </p>
+      <p className="mt-2 text-xs text-ink-faint">Last updated Aug 17, 2026.</p>
 
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-ink-soft">
         <section>
@@ -105,20 +103,25 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="font-display text-base font-medium text-ink">Your rights</h2>
           <p className="mt-2">
-            You can disconnect your account at any time (see the &quot;Disconnect&quot; link in the app) —
-            this clears your session immediately and stops any further processing. Under GDPR you&apos;re also
-            entitled to request access to, or deletion of, any logged history beyond that.{" "}
-            <em>(Flagging honestly: there isn&apos;t a working request channel for that set up yet — this
-            needs a real, monitored point of contact before this policy is actually published.)</em>
+            You can disconnect at any time (see the &quot;Disconnect&quot; link in the app) — this deletes
+            your logged coaching history immediately, not just your session. Under GDPR you&apos;re also
+            entitled to request access to your data. For that, or any other question about this policy,
+            contact us at{" "}
+            <a href="mailto:aerocoachsupport@gmail.com" className="underline">
+              aerocoachsupport@gmail.com
+            </a>
+            .
           </p>
         </section>
 
         <section>
           <h2 className="font-display text-base font-medium text-ink">Data retention</h2>
           <p className="mt-2">
-            Logged coaching history currently has no automatic expiry — it&apos;s kept until you request
-            deletion. <em>(Flagging honestly: a real retention/auto-deletion policy is a reasonable next step,
-            not yet built.)</em>
+            Your logged coaching history is retained only for as long as you stay connected. Disconnecting
+            deletes it immediately and permanently — it isn&apos;t a soft delete or a scheduled cleanup, the
+            underlying record is removed at that moment. There&apos;s no separate time-based auto-expiry on
+            top of that: if you stay connected indefinitely, your history is kept indefinitely to power your
+            fitness trend, until you disconnect or ask us to delete it sooner.
           </p>
         </section>
 
@@ -129,14 +132,6 @@ export default function PrivacyPolicy() {
             in. Google Cloud and Gemini API rely on Google&apos;s own standard contractual clauses / adequacy
             mechanisms for cross-border transfers under GDPR.
           </p>
-        </section>
-
-        <section className="rounded-lg bg-paper-alt p-4 text-xs text-ink-faint">
-          <strong>Status note:</strong> this page is a good-faith draft written to cover the real gaps found
-          during the Aug 16 team review — it is not a substitute for an actual legal read, same status as{" "}
-          <code>DISCLAIMER_DRAFT.md</code>. Before this is a real, publishable policy it needs: a real data
-          controller name/contact, a real deletion mechanism (not just an email address), and a decision on
-          data retention length.
         </section>
       </div>
     </div>

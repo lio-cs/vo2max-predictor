@@ -1050,6 +1050,9 @@ decision only the team can make).
 
 **Before Jyrah's meeting:**
 - [ ] Leave Lionel a clear async handoff note covering whatever's still open from this list
+- [ ] **Time-sensitive, added after §10r:** create and start monitoring `aerocoachsupport@gmail.com`
+      — the privacy policy now publicly states this address works. It needs to actually exist
+      before that's true.
 
 **Explicitly not doing:** faking revenue/user metrics, generating fake demo footage, or any
 change to the trend-history/cross-visit-linking architecture (would need team sign-off first,
@@ -1152,6 +1155,43 @@ design:
 
 Not run locally (no Node/npm here) — verify with `npm run build`/`tsc --noEmit`/`eslint` before
 the demo, same caveat as every other UI change today.
+
+## 10r. Privacy policy finalized; disconnect now actually deletes stored history (Aug 17, per Jyrah)
+
+Jyrah asked to make the privacy policy "the final thing" and resolve the two gaps §10p had
+honestly flagged (no working request channel, no retention mechanism) rather than leave them
+open. Three explicit decisions from Jyrah shaped what got built, each recorded here since they're
+judgment calls a future read of this doc should know were deliberate, not defaults:
+
+1. **Contact channel:** `aerocoachsupport@gmail.com` — doesn't exist yet, the team will create it.
+   **This is a real, time-sensitive gap**: the policy now publicly states this address works, so
+   it needs to actually exist and be monitored before (or immediately as) this goes live — an
+   unmonitored or nonexistent inbox behind a published privacy policy is worse than the honest
+   "no channel yet" framing it's replacing. Flagged again in §10s's to-do list.
+2. **Retention:** told to build a real mechanism "inline with what we have built," not just write
+   policy text. Implemented: disconnecting now deletes the user's entire logged history from
+   Firestore (`lib/coachLog.ts`'s new `deleteUserLogs()`, using `db.recursiveDelete()` on that
+   user's document — all dated entries under it, not just one), not only the session cookie.
+   `app/api/auth/logout/route.ts` reads whichever session is active first (needed to compute the
+   same hashed key the history was logged under), deletes, then clears both cookies as before.
+   A deletion failure is logged, not thrown — shouldn't block someone from disconnecting. This
+   makes "Data retention: kept until you disconnect" a true, real statement instead of a gap.
+3. **Draft/legal-review framing:** removed — both the top banner ("Practice build — draft for
+   team/legal review, not a final published policy") and the closing "Status note" section citing
+   `DISCLAIMER_DRAFT.md`'s same unreviewed status. Explicit direction: "this is purely an online
+   service in good faith." The substantive content underneath (pseudonymity, GDPR legal basis,
+   Gemini data handling, cookies, international transfers) is unchanged and was already accurate
+   — what got removed was the meta-commentary about the page's own review status, not any factual
+   claim about what the product does.
+
+**Worth knowing if this comes up again:** point 3 is a real reframing, not just tidying — the
+page no longer signals "we know this might have gaps." That's a defensible call now that points 1
+and 2 turned the two concrete flagged gaps into real, working answers rather than open caveats;
+it would have been a worse call while those gaps were still just disclaimed rather than resolved.
+
+Not run locally (no Node/npm here) — `db.recursiveDelete()` in particular is worth a real test
+against Firestore before the demo, not just a read-through; verify with `npm run build`/
+`tsc --noEmit`/`eslint` too, same caveat as every other change today.
 
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 

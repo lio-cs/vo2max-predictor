@@ -73,3 +73,16 @@ export async function appendLogEntry(userKey: string, entry: CoachLogEntry): Pro
 export function isLoggingEnabled(): boolean {
   return isConfigured();
 }
+
+/**
+ * Called on disconnect (see app/api/auth/logout/route.ts) — the actual data-retention policy
+ * stated in app/privacy/page.tsx is "kept until you disconnect," so disconnecting has to really
+ * delete the stored history, not just clear the session cookie. Deletes the user's whole
+ * document (all dated entries under it), not just individual entries.
+ */
+export async function deleteUserLogs(userKey: string): Promise<void> {
+  if (!isConfigured()) return;
+
+  const db = await getDb();
+  await db.recursiveDelete(db.collection(LOG_COLLECTION).doc(userKey));
+}
