@@ -11,6 +11,7 @@ import type {
 } from "@/lib/riskTrajectory";
 import { checkRateLimit, getClientKey } from "@/lib/rateLimit";
 import { getValidSession } from "@/lib/googleHealth";
+import { getAppleSession } from "@/lib/appleHealthSession";
 
 const RISK_LEVELS: OsaRiskLevel[] = ["low", "intermediate", "high"];
 const ACTION_TYPES: RecommendedActionType[] = ["monitor", "mention_to_doctor", "see_doctor_soon"];
@@ -103,8 +104,10 @@ export async function POST(request: NextRequest) {
 
   // Same auth gate as /api/coach — without this, anyone could hit this route directly with
   // fabricated context and spam Gemini calls without ever going through the real STOP-BANG
-  // flow that /api/coach requires first.
-  const session = await getValidSession();
+  // flow that /api/coach requires first. Accepts either provider — this route never touches
+  // provider-specific data itself (everything it needs comes from the request body, already
+  // computed by /api/coach), it just needs to know *some* session is active.
+  const session = (await getValidSession()) ?? (await getAppleSession());
   if (!session) {
     return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
   }

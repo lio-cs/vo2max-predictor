@@ -1025,6 +1025,66 @@ decision only the team can make).
 change to the trend-history/cross-visit-linking architecture (would need team sign-off first,
 see §10m).
 
+## 10o. Apple Health support via export import (Aug 17)
+
+Second data source added alongside the Google Health/Fitbit OAuth path: users on Apple Watch
+can now actually import a Health app export, not just see a "coming soon" placeholder. Built in
+parallel with Jyrah's §10j wearable-picker page (`/connect`) — that page already existed with
+Fitbit wired up and Apple Watch/"more wearables" shown as disabled cards; this replaces the
+disabled Apple Watch card with a real, working import flow, keeping her page's copy, layout, and
+the pseudonymity trust line as-is.
+
+**Real constraint found before building anything, which shaped the whole design:** the obvious
+approach — upload export.zip to a Route Handler — doesn't work. Cloud Run hard-caps request
+bodies at **32MB**, and real Apple Health exports routinely exceed that (a real test export
+here was 51MB zipped, 777MB uncompressed once you include years of workout history). Confirmed
+via Cloud Run's own docs/community reports before designing around it, not assumed.
+
+**Design that follows from that constraint:** the zip is parsed **entirely in the browser**,
+never uploaded. `lib/appleHealthParse.ts` streams the file through `fflate` (client-safe,
+zero-dependency), decompressing only the one entry needed (`export.xml`) and reading it
+line-by-line, extracting just three values — date of birth (→ age), latest resting heart rate,
+latest SpO2 — without ever holding the full decompressed file in memory. Only those three
+numbers are POSTed to the new `/api/apple-health/import` route (a few hundred bytes of JSON,
+nowhere near any size limit). This also happens to be strictly better for the "separate health
+data from identity" principle from §10g — the raw export never touches our server at all.
+
+**Real bug caught by testing against an actual export, not synthetic data:** fflate's
+synchronous inflate doesn't stream its output in small pieces the way it streams input — for a
+777MB file it handed back nearly the whole decompressed content in one callback, and
+`TextDecoder.decode()` on a single string that size blew V8's ~536M-character string limit
+(`ERR_STRING_TOO_LONG`). Fixed by decoding in bounded 2MB slices inside the callback regardless
+of how large a chunk fflate hands back — line-buffer memory stays small either way since it's
+drained on every newline. Caught by an actual end-to-end run against a real, large export
+(Jyrah's own Apple Watch data, used as the test fixture with her knowledge), not just the small
+hand-written sample lines in the unit tests — same lesson as the original Fitbit
+ascending/descending ordering bug: verify against real data, not just an assumed shape.
+
+**Kept identical to the Google path per the explicit ask:** VO2max is computed via the exact
+same `estimateVO2Max(age, restingHeartRate)` formula (`lib/vo2max-service.ts`'s new
+`vo2MaxFromAppleSession()`), deliberately *not* Apple Watch's own `HKQuantityTypeIdentifierVO2Max`
+reading (which real exports usually also have) — using one consistent estimation method across
+both providers keeps peer-average/trend/milestone logic comparable regardless of which wearable
+someone used. `app/api/coach/route.ts`'s Google branch is the exact same function calls as
+before this feature (`computeVo2Max()`, `getValidSession()`, `getLatestOxygenSaturation()`,
+`getUserKey()`), now just gated behind "is there a Google session cookie" — nothing about that
+path changed. The Apple branch reuses the same `assessFitnessContext`/`assessOxygenContext`/
+`getCoachDecision`/Firestore logging as everything downstream of that branch point.
+
+Session model: `lib/appleHealthSession.ts` mirrors `lib/session.ts`'s cookie pattern exactly —
+a random id generated at import time (not derived from any health data), hashed the same
+SHA-256-truncated way for Firestore scoping (`getAppleUserKey`), never stored or exposed raw.
+
+Verified: 132 tests passing (28 new — parsing helpers tested against real sample lines pulled
+from an actual export, plus a full manual end-to-end run against the real 51MB/777MB file
+described above), lint clean, build clean, dev server smoke-tested (`/`, `/connect` both render
+correctly).
+
+**Not done, worth flagging:** no interactive browser click-through of the actual file-picker UI
+(no browser automation available in this session) — worth Lionel/Jyrah clicking through the
+real `/connect` → Apple Health import → coaching flow once, same as the outstanding Docker
+build-on-real-machine item in §6.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting

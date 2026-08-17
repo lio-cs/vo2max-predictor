@@ -1,9 +1,11 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
-import { computeVo2Max } from "@/lib/vo2max-service";
+import { getAppleSession, type AppleHealthSession } from "@/lib/appleHealthSession";
+import { computeVo2Max, vo2MaxFromAppleSession, type Vo2MaxResult, type Vo2MaxError } from "@/lib/vo2max-service";
 import { StopBangForm } from "./StopBangForm";
 import { ConnectingState } from "./ConnectingState";
+import { BrandRow } from "./BrandRow";
 
 const ERROR_MESSAGES: Record<string, string> = {
   access_denied: "You declined the Fitbit authorization request.",
@@ -11,17 +13,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   token_exchange_failed: "Couldn't reach Fitbit just now. This is on us, not your data — please try again.",
 };
 
-function BrandRow() {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="relative flex h-2 w-2">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-      </span>
-      <span className="font-display text-lg font-semibold tracking-tight text-ink">AeroCoach</span>
-    </div>
-  );
-}
+type ActiveSession = { provider: "google" } | { provider: "apple"; session: AppleHealthSession };
 
 export default async function Home({
   searchParams,
@@ -29,21 +21,27 @@ export default async function Home({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const session = await getSession();
+  const googleSession = await getSession();
+  const appleSession = googleSession ? null : await getAppleSession();
+  const active: ActiveSession | null = googleSession
+    ? { provider: "google" }
+    : appleSession
+      ? { provider: "apple", session: appleSession }
+      : null;
 
   return (
     <div className="flex min-h-dvh flex-col bg-paper">
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center px-6 py-16 sm:px-10">
         <BrandRow />
 
-        {!session ? (
+        {!active ? (
           <div className="relative mt-10">
             <div
               aria-hidden
               className="animate-breathe absolute -top-16 -left-10 h-56 w-56 rounded-full bg-accent-glow/25 blur-3xl"
             />
             <h1 className="relative font-display text-4xl font-medium leading-[1.1] tracking-tight text-ink sm:text-5xl">
-              Your Fitbit already knows{" "}
+              Your wearable already knows{" "}
               <span className="text-gradient-accent">more than you think</span>.
             </h1>
             <p className="relative mt-4 max-w-prose text-base leading-relaxed text-ink-soft sm:text-lg">
@@ -64,9 +62,10 @@ export default async function Home({
               Get started
             </Link>
             <p className="relative mt-3 max-w-prose text-xs text-ink-faint">
-              Takes under a minute. AeroCoach is a wellness and educational tool, not a
-              diagnostic medical device. It doesn&apos;t replace a physician or a clinical sleep
-              study — it helps you know when it&apos;s time to ask for one.
+              Works with Fitbit (via Google Health) or an Apple Health export. Takes under a
+              minute. AeroCoach is a wellness and educational tool, not a diagnostic medical
+              device. It doesn&apos;t replace a physician or a clinical sleep study — it helps
+              you know when it&apos;s time to ask for one.
             </p>
             <p className="relative mt-2 max-w-prose text-xs text-ink-faint">
               Your results are kept pseudonymous — we never see your name, email, or account
@@ -79,7 +78,7 @@ export default async function Home({
         ) : (
           <div className="mt-10">
             <Suspense fallback={<ConnectingState />}>
-              <Result />
+              <Result active={active} />
             </Suspense>
           </div>
         )}
@@ -88,8 +87,9 @@ export default async function Home({
   );
 }
 
-async function Result() {
-  const result = await computeVo2Max();
+async function Result({ active }: { active: ActiveSession }) {
+  const result: Vo2MaxResult | Vo2MaxError =
+    active.provider === "google" ? await computeVo2Max() : vo2MaxFromAppleSession(active.session);
 
   if ("error" in result) {
     if (result.error === "not_authenticated") {

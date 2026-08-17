@@ -13,6 +13,7 @@
     "@langfuse/otel": "^5.10.0",
     "@langfuse/tracing": "^5.10.0",
     "@opentelemetry/sdk-node": "^0.221.0",
+    "fflate": "^0.8.3",
     "firebase-admin": "^13",
     "next": "16.2.12",
     "react": "19.2.4",

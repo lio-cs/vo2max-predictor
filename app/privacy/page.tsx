@@ -3,18 +3,25 @@ export default function PrivacyPolicy() {
     <div className="mx-auto max-w-2xl px-6 py-16 sm:px-10">
       <h1 className="font-display text-2xl font-medium text-ink">Privacy Policy</h1>
       <p className="mt-2 text-xs text-ink-faint">
-        Practice build — draft for team/legal review, not a final published policy. Last updated Aug 16, 2026.
+        Practice build — draft for team/legal review, not a final published policy. Last updated Aug 17, 2026.
       </p>
 
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-ink-soft">
         <section>
           <h2 className="font-display text-base font-medium text-ink">What we collect</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Your age and resting heart rate, synced from your Fitbit via the Google Health API, used to estimate your VO2max</li>
+            <li>Your age and resting heart rate, either synced from your Fitbit via the Google Health API, or from an Apple Health export you import yourself, used to estimate your VO2max</li>
+            <li>Your blood oxygen (SpO2), if your device supports it</li>
             <li>Your answers to the 8 STOP-BANG screening questions</li>
             <li>The risk score and coaching text derived from the above</li>
             <li>If you use the follow-up chat: the questions you type and the conversation history for that session</li>
           </ul>
+          <p className="mt-2">
+            If you connect via Apple Health, your export.zip is read entirely in your own browser
+            — it is never uploaded anywhere. Only the age, resting heart rate, and blood oxygen
+            values extracted from it are sent to us, the same handful of numbers the Fitbit path
+            already provides.
+          </p>
           <p className="mt-2">
             We do not collect your name, email address, or any other direct identifier — see &quot;Health
             data & special category processing&quot; below for why this still matters under GDPR.

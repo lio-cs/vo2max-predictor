@@ -1,5 +1,6 @@
 import { getAge, getLatestRestingHeartRate, getValidSession } from "./googleHealth";
 import { estimateVO2Max } from "./vo2max";
+import type { AppleHealthSession } from "./appleHealthSession";
 
 export interface Vo2MaxResult {
   age: number;
@@ -52,4 +53,21 @@ export async function computeVo2Max(): Promise<Vo2MaxResult | Vo2MaxError> {
       message: "Something went wrong talking to Google Health. Please try again.",
     };
   }
+}
+
+/**
+ * Same formula as computeVo2Max() above (estimateVO2Max, age + resting heart rate) applied to
+ * an already-imported Apple Health session — deliberately not Apple Watch's own
+ * HKQuantityTypeIdentifierVO2Max reading, even though real exports usually have one, so both
+ * pipelines produce a VO2max number via identical methodology and stay comparable (peer
+ * averages, trend detection, etc. all assume one consistent estimation method). No error
+ * variant: age/restingHeartRate were already validated as present during import (see
+ * lib/appleHealthParse.ts), so this is a pure, synchronous conversion, not a fallible fetch.
+ */
+export function vo2MaxFromAppleSession(session: AppleHealthSession): Vo2MaxResult {
+  return {
+    age: session.age,
+    restingHeartRate: session.restingHeartRate,
+    vo2max: Math.round(estimateVO2Max(session.age, session.restingHeartRate) * 10) / 10,
+  };
 }

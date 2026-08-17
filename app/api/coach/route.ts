@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { computeVo2Max } from "@/lib/vo2max-service";
+import { computeVo2Max, vo2MaxFromAppleSession, type Vo2MaxResult, type Vo2MaxError } from "@/lib/vo2max-service";
 import {
   computeStopBangScore,
   assessFitnessContext,
@@ -13,7 +13,8 @@ import { getCoachDecision } from "@/lib/geminiCoach";
 import { appendLogEntry, getRecentLogs, isLoggingEnabled, type CoachLogEntry } from "@/lib/coachLog";
 import { checkRateLimit, getClientKey } from "@/lib/rateLimit";
 import { getValidSession, getLatestOxygenSaturation } from "@/lib/googleHealth";
-import { getUserKey } from "@/lib/session";
+import { getSession, getUserKey } from "@/lib/session";
+import { getAppleSession, getAppleUserKey } from "@/lib/appleHealthSession";
 
 const STOP_BANG_KEYS: Array<keyof StopBangAnswers> = [
   "snoring",
@@ -61,24 +62,55 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const vo2Result = await computeVo2Max();
-  if ("error" in vo2Result) {
-    const status =
-      vo2Result.error === "not_authenticated"
-        ? 401
-        : vo2Result.error === "no_resting_heart_rate" || vo2Result.error === "no_age"
-          ? 422
-          : 502;
-    return NextResponse.json(vo2Result, { status });
-  }
+  // Two independent providers can be "connected": Google Health (Fitbit, via OAuth) or Apple
+  // Health (via a client-side-parsed export — see lib/appleHealthParse.ts and
+  // app/api/apple-health/import/route.ts). Whichever cookie is present decides the branch; the
+  // Google branch below is the exact same calls as before this feature existed, unchanged.
+  const googleSession = await getSession();
+  const appleSession = googleSession ? null : await getAppleSession();
 
-  // computeVo2Max() already confirmed a valid session exists; this re-read just gets the
-  // session object itself so logs can be scoped per-user instead of colliding in one document.
-  const session = await getValidSession();
-  if (!session) {
+  let vo2Result: Vo2MaxResult | Vo2MaxError;
+  let userKey: string;
+  let oxygenPercentage: number | null = null;
+
+  if (googleSession) {
+    vo2Result = await computeVo2Max();
+    if ("error" in vo2Result) {
+      const status =
+        vo2Result.error === "not_authenticated"
+          ? 401
+          : vo2Result.error === "no_resting_heart_rate" || vo2Result.error === "no_age"
+            ? 422
+            : 502;
+      return NextResponse.json(vo2Result, { status });
+    }
+
+    // computeVo2Max() already confirmed a valid session exists; this re-read just gets the
+    // session object itself so logs can be scoped per-user instead of colliding in one document.
+    const session = await getValidSession();
+    if (!session) {
+      return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
+    }
+    userKey = getUserKey(session);
+
+    // Optional/best-effort — many devices don't support SpO2 at all, and this isn't required
+    // for the core flow the way age/resting heart rate are, so a failure here shouldn't fail
+    // the whole request.
+    try {
+      oxygenPercentage = await getLatestOxygenSaturation(session);
+    } catch (e) {
+      console.error("Failed to fetch oxygen saturation (continuing without it):", e);
+    }
+  } else if (appleSession) {
+    // Already validated at import time (see lib/appleHealthParse.ts) — this is a pure,
+    // synchronous conversion using the same estimateVO2Max formula as the Google path, not a
+    // fallible fetch, so there's no error branch to handle here.
+    vo2Result = vo2MaxFromAppleSession(appleSession);
+    userKey = getAppleUserKey(appleSession);
+    oxygenPercentage = appleSession.oxygenPercentage;
+  } else {
     return NextResponse.json({ error: "not_authenticated" }, { status: 401 });
   }
-  const userKey = getUserKey(session);
 
   const { age, vo2max } = vo2Result;
   const stopBang = computeStopBangScore(stopBangAnswers);
@@ -103,18 +135,7 @@ export async function POST(request: NextRequest) {
     stopBangAnswers.male ? "male" : "female"
   );
 
-  // Optional/best-effort — many devices don't support SpO2 at all, and this isn't required
-  // for the core flow the way age/resting heart rate are, so a failure here shouldn't fail
-  // the whole request.
-  let oxygen: OxygenContext | null = null;
-  try {
-    const oxygenPercentage = await getLatestOxygenSaturation(session);
-    if (oxygenPercentage != null) {
-      oxygen = assessOxygenContext(oxygenPercentage);
-    }
-  } catch (e) {
-    console.error("Failed to fetch oxygen saturation (continuing without it):", e);
-  }
+  const oxygen: OxygenContext | null = oxygenPercentage != null ? assessOxygenContext(oxygenPercentage) : null;
 
   let decision;
   try {
