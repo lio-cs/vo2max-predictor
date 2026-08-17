@@ -1002,12 +1002,17 @@ decision only the team can make).
       changing: OAuth genuinely connects an account, the pseudonymity promise is about what
       happens to the data *after* that, not that no account is ever touched.
 
-**Video (not started):**
-- [ ] Draft the ≤3-minute script/storyboard: problem → how it works (Fitbit VO2max → Gemini
-      coaching) → AI-native proof (visible Gemini-generated text, maps directly to the AI-Native
-      Operations judging criterion) → category-impact/roadmap close. Manus is fine for drafting
-      narration copy; the footage itself has to be real per the Devpost rules (§10m).
-- [ ] Record screen capture + AI or human voiceover reading that script
+**Video:**
+- [x] Draft the ≤3-minute script/storyboard — **done Aug 17**, see `VIDEO_SCRIPT_DRAFT.md`:
+      problem → how it works (Fitbit/Apple Watch VO2max → Gemini coaching) → AI-native proof
+      (visible Gemini-generated text, maps directly to the AI-Native Operations judging
+      criterion) → category-impact/roadmap close. ~335 words, ~2:15–2:35 at natural pace.
+      Storyboard explicitly calls out recording the Fitbit path (the one actually clicked
+      through live by a human) for the demo beat, not the Apple Health import (verified only
+      via automated tests + one scripted end-to-end parse so far, see §10o).
+- [ ] Record screen capture + AI voiceover reading that script — voice tool recommendation in
+      the same file (ElevenLabs free tier, primary; Google Cloud TTS as a slower Google-stack-native
+      alternative)
 - [ ] Upload to YouTube/Vimeo/Youku as a **public** link (required by the rules)
 
 **Devpost submission text (not started):**
