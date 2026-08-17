@@ -5,8 +5,17 @@
 category-impact/roadmap close, ≤3 minutes, honest (no fabricated users/revenue/footage per the
 Devpost rules).
 
-~335 words. At a natural narration pace (130–150 wpm) that's roughly **2:15–2:35**, leaving
-margin under the 3-minute cap for scene transitions and pauses.
+~219 words. At a natural narration pace (120–135 wpm, accounting for pauses between beats)
+that's roughly **1:38–1:50** — comfortably under the 2-minute target.
+
+**Changed from the previous draft:** trimmed for length; the AI-native beat now leads with what
+Gemini does (translation, not judgment) rather than dwelling on it reading data, and pivots
+straight to reassurance that nothing is linked back to the user as a person — matches the
+pseudonymity language already used on the landing/result pages and in the privacy policy. No
+mention of the Gemini XPRIZE submission. Closing dropped the "no fabricated users/revenue" line
+along with it, since that framing existed specifically to address XPRIZE-judging honesty norms —
+worth flagging in case that was still wanted for a different reason. AeroCoach/AeroGlyphics
+attribution is now one short line, exactly as requested.
 
 ---
 
@@ -19,17 +28,15 @@ don't get read aloud by mistake.
 ```
 An estimated one billion people worldwide have obstructive sleep apnea — and more than eighty percent of them don't know it.
 
-The gold-standard test is an overnight stay in a sleep lab. It's expensive, inconvenient, and almost nobody books one without a reason to suspect a problem in the first place.
+The gold-standard test is an overnight stay in a sleep lab — expensive, inconvenient, and almost nobody books one without a reason to suspect a problem in the first place.
 
-AeroCoach is that reason. It reads the fitness data you're already generating — your VO2max, from a Fitbit or an Apple Watch — walks you through STOP-BANG, a validated eight-question sleep apnea screening tool, and turns the result into a plain-English read on your risk.
+AeroCoach is that reason. It reads the fitness data you're already generating — your VO2max, from a Fitbit or an Apple Watch — walks you through STOP-BANG, a validated eight-question screening tool, and turns the result into a plain-English read on your risk.
 
-Here's what that looks like. Connect your wearable — no new hardware, no new habit. AeroCoach estimates your VO2max from your resting heart rate and age, then asks you eight yes-or-no questions. What you're seeing here is Gemini writing this explanation live, in real time — not a canned response. Every call is traced, so we can see exactly what Gemini was given, and exactly what it wrote back.
+Here's what that looks like. Connect your wearable — no new hardware, no new habit. AeroCoach estimates your VO2max from your resting heart rate and age, asks you eight yes-or-no questions, and writes this explanation live, in real time — not a canned response.
 
-That matters, because Gemini's job here is deliberately narrow. It never decides your risk level — that's a validated clinical rule, computed in code, every time, the same way. Gemini's only job is translation: turning an already-decided result into language a non-clinician can actually understand, without it ever sounding like a diagnosis. That's the AI-native part of this build — not a chatbot bolted onto a static app, but a model doing real, live, load-bearing work, with the same guardrails and observability you'd want in anything actually shipping to real people.
+Gemini's job here is deliberately narrow — it never decides your risk level, that's a validated clinical rule, computed the same way every time. Gemini only turns an already-decided result into plain language. And none of it is ever linked back to you as an individual — no name, no email, just the numbers, kept separate from your identity the whole way through.
 
-We built this as AeroGlyphics, for the Gemini XPRIZE, in Education and Human Potential — as a practice sprint, not a polished pitch. No fabricated users. No fabricated revenue. What's real is a live product, a real Fitbit and Apple Health integration, and a deliberate decision to keep AI out of the one place it shouldn't be making the call: your health risk.
-
-Eighty percent of a billion people don't know they have this. AeroCoach is one plain-English nudge toward finding out.
+AeroCoach — built by AeroGlyphics, powered by Gemini. Eighty percent of a billion people don't know they have this. AeroCoach is one plain-English nudge toward finding out.
 ```
 
 ---
@@ -38,21 +45,20 @@ Eighty percent of a billion people don't know they have this. AeroCoach is one p
 
 | Beat | Narration paragraph | ~Time | What's on screen |
 |---|---|---|---|
-| Hook | "An estimated one billion..." | 0:00–0:12 | Static title card or the landing page hero, no interaction yet |
-| Problem | "The gold-standard test..." | 0:12–0:25 | Landing page, slow scroll/hold |
-| Intro | "AeroCoach is that reason..." | 0:25–0:45 | `/connect` wearable-picker page |
-| Live demo | "Here's what that looks like..." | 0:45–1:20 | **Real, live** click-through: connect → STOP-BANG questions → result panel appearing with Gemini's coaching text visibly generating |
-| AI-native proof | "That matters, because..." | 1:20–1:55 | Hold on the coaching result text on screen while this plays; optionally a quick LangFuse trace screenshot showing the real prompt/response pair |
-| Close | "We built this as AeroGlyphics..." | 1:55–2:20 | Back to a wide shot of the app / logo card |
-| Tagline | "Eighty percent of a billion..." | 2:20–2:30 | Logo card, ends |
+| Hook | "An estimated one billion..." | 0:00–0:10 | Static title card or the landing page hero, no interaction yet |
+| Problem | "The gold-standard test..." | 0:10–0:22 | Landing page, slow scroll/hold |
+| Intro | "AeroCoach is that reason..." | 0:22–0:40 | `/connect` wearable-picker page |
+| Live demo | "Here's what that looks like..." | 0:40–1:05 | **Real, live** click-through: connect → STOP-BANG questions → result panel appearing with Gemini's coaching text visibly generating |
+| AI-native + trust | "Gemini's job here is..." | 1:05–1:35 | Hold on the coaching result text on screen while this plays |
+| Close + tagline | "AeroCoach — built by AeroGlyphics..." | 1:35–1:50 | Logo card, ends |
 
 **Only use real, live footage for the demo beat** — per the Devpost rules already flagged in
 §10m, no mockups presented as if they're the working product. Record the **Fitbit path**, since
 that's the one that's actually been clicked through live by a human this session. The Apple
 Health import (§10o) is verified end-to-end via automated tests and one real 51MB-export parse,
 but nobody has clicked through the actual browser file-picker yet — don't put it in the video
-until someone has, even though the script's one mention of "a real Fitbit and Apple Health
-integration" is accurate either way (both are genuinely live in the deployed app).
+until someone has, even though the script's one mention of "a Fitbit or an Apple Watch" is
+accurate either way (both are genuinely live in the deployed app).
 
 ---
 
@@ -61,8 +67,8 @@ integration" is accurate either way (both are genuinely live in the deployed app
 **elevenlabs.io** — sign up free, paste the script above into their Text to Speech tool, pick a
 voice, generate, download the MP3. No GCP setup, no API keys, done in a couple of minutes.
 
-- Free tier includes roughly 10,000 characters/month; this script is under 2,000 characters, so
-  it fits comfortably with room to regenerate a few times if a take doesn't land.
+- Free tier includes roughly 10,000 characters/month; this script is around 1,200 characters, so
+  it fits comfortably with plenty of room to regenerate takes.
 - Voice pick: choose something calm and even — a "Narration" or "Documentary" preset, not an
   energetic/hype voice. This is health-adjacent content; the same "calm, not alarming" tone
   already baked into the product's own coaching copy (see `lib/geminiCoach.ts`'s system prompt)
