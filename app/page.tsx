@@ -128,7 +128,7 @@ async function Result({ active }: { active: ActiveSession }) {
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-full border border-hairline px-4 py-2 text-xs font-medium text-ink-soft transition-colors hover:bg-paper-alt"
+              className="inline-flex items-center justify-center rounded-full border border-hairline px-4 py-2 text-xs font-medium text-ink-soft transition-all hover:-translate-y-0.5 hover:bg-paper-alt"
             >
               Check again
             </Link>
@@ -163,7 +163,7 @@ async function Result({ active }: { active: ActiveSession }) {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-full border border-hairline px-4 py-2 text-xs font-medium text-ink-soft transition-colors hover:bg-paper-alt"
+            className="inline-flex items-center justify-center rounded-full border border-hairline px-4 py-2 text-xs font-medium text-ink-soft transition-all hover:-translate-y-0.5 hover:bg-paper-alt"
           >
             Try again
           </Link>

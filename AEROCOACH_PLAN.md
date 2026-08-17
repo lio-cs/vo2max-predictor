@@ -1262,6 +1262,26 @@ the "Recommended AI voice tool" section to match. Worth knowing this is in real 
 comes up again, not an unnoticed drift. The call has been made in favor of the more energetic
 register; not re-litigated here.
 
+## 10u. Last-minute hover/motion polish (Aug 17, per Jyrah, late night)
+
+Two small "make it feel lively" requests just before recording the founder-led demo (plan changed
+after the Devpost portal closed — see chat, submitting via direct email to organizers instead):
+
+- **Hover lift on interactive elements** that had color-only hover states before: the `/connect`
+  wearable cards (`app/connect/page.tsx`, both the Fitbit link-card and the Apple Watch
+  `<details>` card) and the follow-up chat's suggestion chips/send button
+  (`app/FollowUpChat.tsx`) now get the same `hover:-translate-y-0.5` lift the main CTA buttons
+  already had. Deliberately did **not** add lift to plain text underline links (Disconnect, Redo
+  screening) — a vertical lift on inline text reads as a glitch, not a lift; that pattern is
+  reserved for card/button-shaped elements with their own background.
+- **Three-dot "thinking" animation** replacing the static "Thinking…" text in the follow-up
+  chat's loading state — new `.animate-typing-dot` keyframe in `globals.css` (staggered bounce,
+  same pattern as the existing `.animate-eq`/`.animate-breathe` keyframes), added to the
+  `prefers-reduced-motion` disable list alongside the others.
+
+Not run locally (no Node/npm here) — verify with `npm run build`/`tsc --noEmit`/`eslint` before
+recording, same caveat as every other change today.
+
 ## 10. Session summary (this Claude session, Aug 10–11) and what's next
 
 **What got done, end to end:** reconciled the whole plan against the real Aug 9 mentor meeting

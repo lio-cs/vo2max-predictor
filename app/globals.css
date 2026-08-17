@@ -109,11 +109,21 @@ body {
   animation: draw-line 2.6s ease-in-out infinite;
 }
 
+/* Three-dot "typing" indicator for the follow-up chat's loading state. */
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.animate-typing-dot {
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-breathe,
   .animate-eq,
   .animate-draw-line,
-  .animate-ping {
+  .animate-ping,
+  .animate-typing-dot {
     animation: none !important;
   }
 }

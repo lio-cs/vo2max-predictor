@@ -93,8 +93,10 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
             </div>
           ))}
           {status === "loading" && (
-            <div className="max-w-[85%] rounded-lg bg-paper-alt px-3 py-2 text-xs text-ink-faint">
-              Thinking…
+            <div className="flex w-fit items-center gap-1 rounded-lg bg-paper-alt px-3 py-2.5" aria-label="Thinking">
+              <span className="h-1.5 w-1.5 animate-typing-dot rounded-full bg-ink-faint" style={{ animationDelay: "0s" }} />
+              <span className="h-1.5 w-1.5 animate-typing-dot rounded-full bg-ink-faint" style={{ animationDelay: "0.15s" }} />
+              <span className="h-1.5 w-1.5 animate-typing-dot rounded-full bg-ink-faint" style={{ animationDelay: "0.3s" }} />
             </div>
           )}
           <div ref={threadEndRef} />
@@ -107,7 +109,7 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
             <button
               key={q}
               onClick={() => ask(q)}
-              className="rounded-full border border-hairline px-2.5 py-1 text-[11px] text-ink-soft transition-colors hover:border-accent hover:text-accent-ink disabled:opacity-50"
+              className="rounded-full border border-hairline px-2.5 py-1 text-[11px] text-ink-soft transition-all hover:-translate-y-0.5 hover:border-accent hover:text-accent-ink disabled:opacity-50 disabled:hover:translate-y-0"
             >
               {q}
             </button>
@@ -144,7 +146,7 @@ export function FollowUpChat({ stopBang, fitness, oxygen, decision }: FollowUpCh
         <button
           type="submit"
           disabled={status === "loading" || !input.trim()}
-          className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-paper transition-colors hover:bg-accent disabled:opacity-50"
+          className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-paper transition-all hover:-translate-y-0.5 hover:bg-accent disabled:opacity-50 disabled:hover:translate-y-0"
         >
           Send
         </button>

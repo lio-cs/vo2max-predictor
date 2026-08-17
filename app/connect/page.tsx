@@ -58,8 +58,8 @@ function WearableCard({ name, description, href }: Wearable) {
 
   const card = (
     <div
-      className={`flex items-center gap-4 rounded-xl border border-hairline bg-paper-alt p-4 transition-colors ${
-        available ? "hover:border-accent" : "opacity-60"
+      className={`flex items-center gap-4 rounded-xl border border-hairline bg-paper-alt p-4 transition-all ${
+        available ? "hover:-translate-y-0.5 hover:border-accent" : "opacity-60"
       }`}
     >
       <WatchIcon className={`h-6 w-6 shrink-0 ${available ? "text-accent" : "text-ink-faint"}`} />
@@ -98,7 +98,7 @@ function WearableCard({ name, description, href }: Wearable) {
 // visually anchor the list before someone's actually chosen this card.
 function AppleWatchCard() {
   return (
-    <details className="group space-y-3 rounded-xl border border-hairline bg-paper-alt p-4">
+    <details className="group space-y-3 rounded-xl border border-hairline bg-paper-alt p-4 transition-all hover:-translate-y-0.5 hover:border-accent">
       <summary className="flex cursor-pointer list-none items-center gap-4 [&::-webkit-details-marker]:hidden">
         <WatchIcon className="h-6 w-6 shrink-0 text-accent" />
         <div className="flex-1">
